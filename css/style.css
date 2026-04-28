@@ -102,7 +102,7 @@ nav a.active {
 
 /* HERO */
 .hero {
-    position: relative;
+    position: center;
     min-height: 100vh;
     overflow: hidden;
 }
