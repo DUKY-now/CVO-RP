@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>CONSOLE CVO</title>
-    <link rel="icon" type="image/png" href="/assets/logo/Fav_Icon.png">
+<link rel="icon" type="image/png" href="/assets/logo/Fav_Icon.png">
 <link rel="stylesheet" href="/css/style.css">
 </head>
 
@@ -12,48 +12,48 @@
 <!-- LOGIN -->
 <div id="login-box">
     <h1>ACCÈS RESTREINT</h1>
-
     <input type="password" id="pwd" placeholder="Mot de passe">
     <button onclick="login()">Entrer</button>
-
     <p id="error" style="color:red;"></p>
 </div>
 
-<!-- PANEL ADMIN -->
+<!-- PANEL -->
 <div id="panel" style="display:none;">
 
-    <h1>CONSOLE CVO</h1>
+<h1>CONSOLE CVO</h1>
 
 <label>Progression globale</label>
+<input type="range" id="globalInput" min="0" max="100">
+<input type="number" id="globalRange" min="0" max="100">
 
-<input type="range" id="globalRange" min="0" max="100">
-<input type="number" id="globalInput" min="0" max="100">
+<br><br>
 
-    <br><br>
+<label>Phase actuelle</label>
+<select id="phase">
+    <option value="1">Phase 1</option>
+    <option value="2">Phase 2</option>
+    <option value="3">Phase 3</option>
+    <option value="4">Phase 4</option>
+    <option value="5">Phase 5</option>
+</select>
 
-    <label>Phase actuelle</label>
-    <select id="phase">
-        <option value="1">Phase 1</option>
-        <option value="2">Phase 2</option>
-        <option value="3">Phase 3</option>
-        <option value="4">Phase 4</option>
-        <option value="5">Phase 5</option>
-    </select>
-    <br><br>   
+<br><br>
+
 <label>Progression phase</label>
+<input type="range" id="phaseInput" min="0" max="100">
+<input type="number" id="phaseRange" min="0" max="100">
 
-<input type="range" id="phaseRange" min="0" max="100">
-<input type="number" id="phaseInput" min="0" max="100">
-    <br><br>
+<br><br>
 
-    <button onclick="save()">Sauvegarder</button>
+<button onclick="save()">Sauvegarder</button>
 
-        <a href="/pages/trames.html" class="btn primary">Page Trame</a>
-                <a href="index.html" class="btn primary">accueil</a>
+<a href="/pages/trames.html">Trames</a>
+<a href="/index.html">Accueil</a>
+
 </div>
 
 <script>
-const ADMIN_PASSWORD = "admin"; // 🔐 change ça
+const ADMIN_PASSWORD = "admin";
 
 function login() {
     const input = document.getElementById("pwd").value;
@@ -61,26 +61,24 @@ function login() {
     if (input === ADMIN_PASSWORD) {
         document.getElementById("login-box").style.display = "none";
         document.getElementById("panel").style.display = "block";
-
         loadState();
     } else {
         document.getElementById("error").innerText = "Accès refusé";
     }
 }
 
-const globalRange = document.getElementById("globalRange");
-const globalInput = document.getElementById("globalInput");
+// sync sliders
+const g1 = document.getElementById("globalInput");
+const g2 = document.getElementById("globalRange");
 
-const phaseRange = document.getElementById("phaseRange");
-const phaseInput = document.getElementById("phaseInput");
+g1.oninput = () => g2.value = g1.value;
+g2.oninput = () => g1.value = g2.value;
 
-// sync global
-globalRange.oninput = () => globalInput.value = globalRange.value;
-globalInput.oninput = () => globalRange.value = globalInput.value;
+const p1 = document.getElementById("phaseInput");
+const p2 = document.getElementById("phaseRange");
 
-// sync phase
-phaseRange.oninput = () => phaseInput.value = phaseRange.value;
-phaseInput.oninput = () => phaseRange.value = phaseInput.value;
+p1.oninput = () => p2.value = p1.value;
+p2.oninput = () => p1.value = p2.value;
 
 function loadState() {
     const state = JSON.parse(localStorage.getItem("cvo_state")) || {
@@ -105,17 +103,13 @@ function save() {
         phaseProgress: Number(document.getElementById("phaseInput").value)
     };
 
-    console.log("SAVE STATE:", state); // DEBUG
-
     localStorage.setItem("cvo_state", JSON.stringify(state));
 
-    // 🔥 FORCE UPDATE DIRECT (IMPORTANT)
     window.dispatchEvent(new Event("storage"));
 
     alert("Sauvegardé");
 }
 </script>
-
 
 </body>
 </html>

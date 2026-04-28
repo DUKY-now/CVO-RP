@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/assets/logo/1_Logo_CVO.png">
+
+<link rel="icon" type="image/png" href="/assets/logo/1_Logo_CVO.png">
 <title>Trames RP | CVO</title>
 
 <link rel="stylesheet" href="/css/style.css">
@@ -12,13 +12,11 @@
 
 <body>
 
-<!-- NAVBAR -->
 <div id="navbar"></div>
 
 <!-- HERO -->
 <section class="sub-hero">
     <div class="overlay"></div>
-
     <div class="hero-content">
         <h1>TRAMES RP</h1>
         <p>Suivi des opérations et évolution de Skyline Valley</p>
@@ -34,13 +32,12 @@
     </p>
 </section>
 
-<!-- PROGRESSION GLOBALE -->
+<!-- GLOBAL PROGRESS -->
 <section class="section">
 
 <h2>📊 État de la campagne</h2>
 
 <div class="progress-box">
-
     <div class="progress-label">Progression globale</div>
 
     <div class="progress-bar">
@@ -48,175 +45,70 @@
     </div>
 
     <span id="globalPercent">0%</span>
-
-</div>
 </div>
 
 </section>
 
-<!-- ===================== -->
 <!-- PHASE 1 -->
-<!-- ===================== -->
 <section class="section phase-block" id="phase1">
-
 <h2>🟩 Phase 1 — Reconnaissance</h2>
 
-<p>
-Exploration initiale de Skyline Valley et sécurisation discrète de la zone.
-</p>
-
 <div class="progress-box">
-
-    <div class="progress-label">Progression de la phase actuelle</div>
-
+    <div class="progress-label">Progression phase</div>
     <div class="progress-bar">
-<div class="progress-fill" id="phaseBar1"></div>
-<span id="phasePercent1">0%</span>
+        <div class="progress-fill" id="phaseBar1"></div>
     </div>
-
+    <span id="phasePercent1">0%</span>
 </div>
 
-
-<h3>Objectifs</h3>
-<ul class="list">
-<li>Identifier 3 zones d’avant-postes</li>
-<li>Maintenir une présence discrète</li>
-<li>Assurer une logistique de base</li>
-</ul>
-
+<p>Exploration initiale de Skyline Valley.</p>
 </section>
 
-<!-- ===================== -->
 <!-- PHASE 2 -->
-<!-- ===================== -->
-<section class="section dark phase-block" id="phase2">
-
+<section class="section phase-block" id="phase2">
 <h2>🟨 Phase 2 — Installation</h2>
 
-<p>
-Déploiement progressif des forces et construction des avant-postes.
-</p>
-
 <div class="progress-box">
-
-    <div class="progress-label">Progression de la phase actuelle</div>
-
+    <div class="progress-label">Progression phase</div>
     <div class="progress-bar">
-<div class="progress-fill" id="phaseBar2"></div>
-<span id="phasePercent2">0%</span>
+        <div class="progress-fill" id="phaseBar2"></div>
     </div>
-
-
+    <span id="phasePercent2">0%</span>
 </div>
 
-<h3>Objectifs</h3>
-<ul class="list">
-<li>Construction des bases avancées</li>
-<li>Stabilisation logistique</li>
-<li>Présence militaire continue</li>
-</ul>
-
+<p>Déploiement et construction des avant-postes.</p>
 </section>
 
-<!-- ===================== -->
-<!-- PHASE 3 (LOCKED) -->
-<!-- ===================== -->
-<section class="section locked phase-block" id="phase3">
-
+<!-- PHASE 3 -->
+<section class="section phase-block" id="phase3">
 <h2>🟥 Phase 3 — ???</h2>
-
-<p class="locked-text">
-⚠ Informations classifiées — accès réservé au haut commandement
-</p>
-
-<div class="lock-box">
-    🔒 CONTENU VERROUILLÉ RP
-</div>
-
+<div class="lock-box">🔒 CONTENU VERROUILLÉ RP</div>
 </section>
 
-<!-- ===================== -->
-<!-- PHASE 4 (LOCKED) -->
-<!-- ===================== -->
-<section class="section locked phase-block" id="phase4">
-
+<!-- PHASE 4 -->
+<section class="section phase-block" id="phase4">
 <h2>☢️ Phase 4 — ???</h2>
-
-<div class="lock-box">
-    🔒 DONNÉES INACCESSIBLES
-</div>
-
+<div class="lock-box">🔒 DONNÉES INACCESSIBLES</div>
 </section>
 
-<!-- ===================== -->
-<!-- PHASE 5 (LOCKED FINAL) -->
-<!-- ===================== -->
-<section class="section locked phase-block" id="phase5">
-
+<!-- PHASE 5 -->
+<section class="section phase-block" id="phase5">
 <h2>⚔️ Phase 5 — ???</h2>
-
-<div class="lock-box final">
-    🔒 ACCÈS REFUSÉ — CLASSIFICATION MAXIMALE
-</div>
-
+<div class="lock-box final">🔒 CLASSIFICATION MAXIMALE</div>
 </section>
 
-<!-- LORE CONTEXT -->
+<!-- CONTEXTE -->
 <section class="section dark">
-
 <h2>📡 Contexte actuel</h2>
-
 <p>
-Des forces communistes sont détectées dans la région.
-Une structure inconnue est en cours de construction.
-Des effets comportementaux commencent à apparaître.
+Communistes détectés. Structure inconnue. Changements comportementaux en cours.
 </p>
-
 </section>
 
-<!-- FOOTER -->
 <div id="footer"></div>
 
 <script src="/assets/js/main.js"></script>
 <script src="/assets/js/trames.js"></script>
 
-<script>
-function loadState() {
-    return JSON.parse(localStorage.getItem("cvo_state")) || {
-        phase: 1,
-        progression: 0
-    };
-}
-
-function applyState() {
-    const state = loadState();
-
-    // progression bar
-    const progressBar = document.querySelector(".progress-fill");
-    if (progressBar) {
-        progressBar.style.width = state.progression + "%";
-    }
-
-    // phases unlock
-    document.querySelectorAll(".locked").forEach((el, index) => {
-        if (state.phase > index + 2) {
-            el.classList.remove("locked");
-        }
-    });
-
-    // effet phase 4
-    if (state.phase == 4) {
-        document.body.classList.add("phase-4");
-    } else {
-        document.body.classList.remove("phase-4");
-    }
-}
-
-// initial load
-applyState();
-
-// 🔁 LIVE UPDATE (clé du fix)
-setInterval(applyState, 1000);
-</script>
 </body>
 </html>
