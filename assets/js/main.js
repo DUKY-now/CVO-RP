@@ -21,3 +21,15 @@ function setActiveLink() {
 }
 
 setTimeout(setActiveLink, 100);
+
+if (state.phase == 4) {
+    document.body.classList.add("phase-4");
+}
+
+if (state.progression > 60) {
+    document.body.style.setProperty("--accent", "#8b0000");
+}
+
+if (state.progression > 80) {
+    document.body.style.filter = "hue-rotate(20deg)";
+}

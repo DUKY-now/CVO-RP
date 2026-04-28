@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>CONSOLE CVO</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body style="background:#000; color:#d4af37; font-family:Inter;">
+
+<!-- LOGIN -->
+<div id="login-box">
+    <h1>ACCÈS RESTREINT</h1>
+
+    <input type="password" id="pwd" placeholder="Mot de passe">
+    <button onclick="login()">Entrer</button>
+
+    <p id="error" style="color:red;"></p>
+</div>
+
+<!-- PANEL ADMIN -->
+<div id="panel" style="display:none;">
+
+    <h1>CONSOLE CVO</h1>
+
+    <label>Progression globale</label>
+    <input type="range" id="progress" min="0" max="100">
+
+    <br><br>
+
+    <label>Phase actuelle</label>
+    <select id="phase">
+        <option value="1">Phase 1</option>
+        <option value="2">Phase 2</option>
+        <option value="3">Phase 3</option>
+        <option value="4">Phase 4</option>
+        <option value="5">Phase 5</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="save()">Sauvegarder</button>
+
+</div>
+
+<script>
+const ADMIN_PASSWORD = "LixLePlusFort"; // 🔐 change ça
+
+function login() {
+    const input = document.getElementById("pwd").value;
+
+    if (input === ADMIN_PASSWORD) {
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+
+        loadState();
+    } else {
+        document.getElementById("error").innerText = "Accès refusé";
+    }
+}
+
+function loadState() {
+    const state = JSON.parse(localStorage.getItem("cvo_state")) || {
+        phase: 1,
+        progression: 0
+    };
+
+    document.getElementById("progress").value = state.progression;
+    document.getElementById("phase").value = state.phase;
+}
+
+function save() {
+    const state = {
+        progression: document.getElementById("progress").value,
+        phase: document.getElementById("phase").value
+    };
+
+    localStorage.setItem("cvo_state", JSON.stringify(state));
+
+    alert("Mise à jour effectuée");
+}
+</script>
+
+</body>
+</html>
