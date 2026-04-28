@@ -1,5 +1,5 @@
 
-function loadState() {
+function getState() {
     return JSON.parse(localStorage.getItem("cvo_state")) || {
         phase: 1,
         progression: 0,
@@ -8,32 +8,31 @@ function loadState() {
 }
 
 function applyState() {
-    const state = loadState();
+    const state = getState();
 
-    // 📊 BARRE GLOBALE
-    const globalBar = document.querySelector(".progress-fill");
-    const globalText = document.getElementById("progress-text");
+    // 🔥 GLOBAL
+    const globalBar = document.getElementById("globalBar");
+    const globalText = document.getElementById("globalPercent");
 
     if (globalBar) {
         globalBar.style.width = state.progression + "%";
     }
     if (globalText) {
-        globalText.innerText = state.progression + "%";
+        globalText.textContent = state.progression + "%";
     }
 
-    // 📈 BARRE PHASE (FIX IMPORTANT)
-    const phaseBar = document.getElementById("phase-fill");
-    const phaseText = document.getElementById("phase-text");
+    // 🔥 PHASE
+    const phaseBar = document.getElementById("phaseBar");
+    const phaseText = document.getElementById("phasePercent");
 
     if (phaseBar) {
         phaseBar.style.width = state.phaseProgress + "%";
     }
-
     if (phaseText) {
-        phaseText.innerText = state.phaseProgress + "%";
+        phaseText.textContent = state.phaseProgress + "%";
     }
 
-    // 🔓 PHASE UNLOCK
+    // 🔓 LOCK SYSTEM
     document.querySelectorAll(".locked").forEach((el, index) => {
         if (state.phase > index + 1) {
             el.classList.remove("locked");
@@ -41,11 +40,7 @@ function applyState() {
     });
 
     // 🌧️ PHASE 4 EFFECT
-    if (Number(state.phase) === 4) {
-        document.body.classList.add("phase-4");
-    } else {
-        document.body.classList.remove("phase-4");
-    }
+    document.body.classList.toggle("phase-4", state.phase === 4);
 }
 
 // init

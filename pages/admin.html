@@ -24,8 +24,10 @@
 
     <h1>CONSOLE CVO</h1>
 
-<label>Progression phase (%)</label>
-<input type="number" id="phaseProgress" min="0" max="100">
+<label>Progression globale</label>
+
+<input type="range" id="globalRange" min="0" max="100">
+<input type="number" id="globalInput" min="0" max="100">
 
     <br><br>
 
@@ -38,8 +40,10 @@
         <option value="5">Phase 5</option>
     </select>
     <br><br>   
-<label>Progression phase (%)</label>
-<input type="number" id="phaseProgress" min="0" max="100">
+<label>Progression phase</label>
+
+<input type="range" id="phaseRange" min="0" max="100">
+<input type="number" id="phaseInput" min="0" max="100">
     <br><br>
 
     <button onclick="save()">Sauvegarder</button>
@@ -64,6 +68,20 @@ function login() {
     }
 }
 
+const globalRange = document.getElementById("globalRange");
+const globalInput = document.getElementById("globalInput");
+
+const phaseRange = document.getElementById("phaseRange");
+const phaseInput = document.getElementById("phaseInput");
+
+// sync global
+globalRange.oninput = () => globalInput.value = globalRange.value;
+globalInput.oninput = () => globalRange.value = globalInput.value;
+
+// sync phase
+phaseRange.oninput = () => phaseInput.value = phaseRange.value;
+phaseInput.oninput = () => phaseRange.value = phaseInput.value;
+
 function loadState() {
     const state = JSON.parse(localStorage.getItem("cvo_state")) || {
         phase: 1,
@@ -76,14 +94,13 @@ function loadState() {
 
 function save() {
     const state = {
-        progression: document.getElementById("progress").value,
-        phase: document.getElementById("phase").value,
-        phaseProgress: document.getElementById("phaseProgress").value
+        phase: Number(document.getElementById("phase").value),
+        progression: Number(document.getElementById("globalInput").value),
+        phaseProgress: Number(document.getElementById("phaseInput").value)
     };
 
     localStorage.setItem("cvo_state", JSON.stringify(state));
-
-    alert("Mise à jour effectuée");
+    alert("Sauvegardé");
 }
 </script>
 
