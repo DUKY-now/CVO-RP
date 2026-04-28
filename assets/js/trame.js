@@ -1,33 +1,44 @@
 function loadState() {
     return JSON.parse(localStorage.getItem("cvo_state")) || {
         phase: 1,
-        progression: 0
+        progression: 0,
+        phaseProgress: 0
     };
 }
 
 function applyState() {
     const state = loadState();
 
-    // 🔥 BARRE
-    const bar = document.querySelector(".progress-fill");
-    if (bar) {
-        bar.style.width = state.progression + "%";
+    // 📊 PROGRESSION GLOBALE
+    const globalBar = document.querySelector(".progress-fill");
+    const globalText = document.getElementById("progress-text");
+
+    if (globalBar) {
+        globalBar.style.width = state.progression + "%";
+    }
+    if (globalText) {
+        globalText.innerText = state.progression + "%";
     }
 
-    // 🔥 TEXTE POURCENTAGE (TON BUG)
-    const text = document.getElementById("progress-text");
-    if (text) {
-        text.innerText = state.progression + "%";
+    // 📈 PROGRESSION PHASE
+    const phaseBar = document.getElementById("phase-fill");
+    const phaseText = document.getElementById("phase-text");
+
+    if (phaseBar) {
+        phaseBar.style.width = state.phaseProgress + "%";
+    }
+    if (phaseText) {
+        phaseText.innerText = state.phaseProgress + "%";
     }
 
-    // 🔥 PHASES LOCKED
+    // 🔓 PHASES
     document.querySelectorAll(".locked").forEach((el, index) => {
         if (state.phase > index + 1) {
             el.classList.remove("locked");
         }
     });
 
-    // 🔥 UI PHASE 4
+    // 🌧️ PHASE 4 EFFECTS
     if (state.phase == 4) {
         document.body.classList.add("phase-4");
     } else {
@@ -35,8 +46,5 @@ function applyState() {
     }
 }
 
-// init
 applyState();
-
-// live sync
 setInterval(applyState, 1000);

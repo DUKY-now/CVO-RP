@@ -37,7 +37,9 @@
         <option value="4">Phase 4</option>
         <option value="5">Phase 5</option>
     </select>
-
+    <br><br>   
+<label>Progression de la phase (%)</label>
+<input type="range" id="phaseProgress" min="0" max="100">
     <br><br>
 
     <button onclick="save()">Sauvegarder</button>
@@ -47,7 +49,7 @@
 </div>
 
 <script>
-const ADMIN_PASSWORD = "LixLePlusFort"; // 🔐 change ça
+const ADMIN_PASSWORD = "admin"; // 🔐 change ça
 
 function login() {
     const input = document.getElementById("pwd").value;
@@ -75,7 +77,8 @@ function loadState() {
 function save() {
     const state = {
         progression: document.getElementById("progress").value,
-        phase: document.getElementById("phase").value
+        phase: document.getElementById("phase").value,
+        phaseProgress: document.getElementById("phaseProgress").value
     };
 
     localStorage.setItem("cvo_state", JSON.stringify(state));

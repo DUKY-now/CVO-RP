@@ -355,3 +355,9 @@ body.phase-4::before {
     opacity: 0.15;
     pointer-events: none;
 }
+
+.progress-label {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
