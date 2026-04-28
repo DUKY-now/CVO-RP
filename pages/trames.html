@@ -166,5 +166,44 @@ Des effets comportementaux commencent à apparaître.
 
 <script src="/assets/js/main.js"></script>
 <script src="/assets/js/trames.js"></script>
+
+<script>
+function loadState() {
+    return JSON.parse(localStorage.getItem("cvo_state")) || {
+        phase: 1,
+        progression: 0
+    };
+}
+
+function applyState() {
+    const state = loadState();
+
+    // progression bar
+    const progressBar = document.querySelector(".progress-fill");
+    if (progressBar) {
+        progressBar.style.width = state.progression + "%";
+    }
+
+    // phases unlock
+    document.querySelectorAll(".locked").forEach((el, index) => {
+        if (state.phase > index + 2) {
+            el.classList.remove("locked");
+        }
+    });
+
+    // effet phase 4
+    if (state.phase == 4) {
+        document.body.classList.add("phase-4");
+    } else {
+        document.body.classList.remove("phase-4");
+    }
+}
+
+// initial load
+applyState();
+
+// 🔁 LIVE UPDATE (clé du fix)
+setInterval(applyState, 1000);
+</script>
 </body>
 </html>
