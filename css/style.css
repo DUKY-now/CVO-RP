@@ -313,8 +313,19 @@ footer {
 
 /* LOCKED SECTIONS */
 .locked {
-    opacity: 0.4;
+    opacity: 0.3;
     filter: blur(1px);
+}
+
+body.phase-4 {
+    background: #050505;
+    animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+    0% { filter: none; }
+    50% { filter: hue-rotate(20deg) contrast(1.2); }
+    100% { filter: none; }
 }
 
 .lock-box {
@@ -335,10 +346,6 @@ footer {
     font-style: italic;
 }
 
-body.phase-4 {
-    background: #050505;
-    filter: contrast(1.2) saturate(0.8);
-}
 
 body.phase-4::before {
     content: "";
