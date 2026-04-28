@@ -105,9 +105,13 @@ function save() {
         phaseProgress: Number(document.getElementById("phaseInput").value)
     };
 
+    console.log("SAVE STATE:", state); // DEBUG
+
     localStorage.setItem("cvo_state", JSON.stringify(state));
 
-    console.log("STATE SAVED:", state); // DEBUG IMPORTANT
+    // 🔥 FORCE UPDATE DIRECT (IMPORTANT)
+    window.dispatchEvent(new Event("storage"));
+
     alert("Sauvegardé");
 }
 </script>

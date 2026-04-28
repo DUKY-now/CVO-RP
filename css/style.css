@@ -361,3 +361,15 @@ body.phase-4::before {
     font-size: 0.9rem;
     color: #ccc;
 }
+
+.phase-block {
+    opacity: 0.3;
+    filter: grayscale(0.4);
+    transition: 0.3s ease;
+}
+
+.phase-block.active-phase {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.01);
+}
