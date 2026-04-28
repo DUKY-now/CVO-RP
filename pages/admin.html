@@ -85,11 +85,17 @@ phaseInput.oninput = () => phaseRange.value = phaseInput.value;
 function loadState() {
     const state = JSON.parse(localStorage.getItem("cvo_state")) || {
         phase: 1,
-        progression: 0
+        progression: 0,
+        phaseProgress: 0
     };
 
-    document.getElementById("progress").value = state.progression;
     document.getElementById("phase").value = state.phase;
+
+    document.getElementById("globalInput").value = state.progression;
+    document.getElementById("globalRange").value = state.progression;
+
+    document.getElementById("phaseInput").value = state.phaseProgress;
+    document.getElementById("phaseRange").value = state.phaseProgress;
 }
 
 function save() {
@@ -100,6 +106,8 @@ function save() {
     };
 
     localStorage.setItem("cvo_state", JSON.stringify(state));
+
+    console.log("STATE SAVED:", state); // DEBUG IMPORTANT
     alert("Sauvegardé");
 }
 </script>

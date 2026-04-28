@@ -1,4 +1,3 @@
-
 function getState() {
     return JSON.parse(localStorage.getItem("cvo_state")) || {
         phase: 1,
@@ -10,36 +9,32 @@ function getState() {
 function applyState() {
     const state = getState();
 
-    // 🔥 GLOBAL
+    // 🔥 GLOBAL BAR
     const globalBar = document.getElementById("globalBar");
     const globalText = document.getElementById("globalPercent");
 
-    if (globalBar) {
-        globalBar.style.width = state.progression + "%";
-    }
-    if (globalText) {
-        globalText.textContent = state.progression + "%";
-    }
+    if (globalBar) globalBar.style.width = state.progression + "%";
+    if (globalText) globalText.textContent = state.progression + "%";
 
-    // 🔥 PHASE
-    const phaseBar = document.getElementById("phaseBar");
-    const phaseText = document.getElementById("phasePercent");
+    // 🔥 PHASE SYSTEM (IMPORTANT)
+    document.querySelectorAll("[data-phase]").forEach(section => {
+        const phaseId = Number(section.dataset.phase);
 
-    if (phaseBar) {
-        phaseBar.style.width = state.phaseProgress + "%";
-    }
-    if (phaseText) {
-        phaseText.textContent = state.phaseProgress + "%";
-    }
-
-    // 🔓 LOCK SYSTEM
-    document.querySelectorAll(".locked").forEach((el, index) => {
-        if (state.phase > index + 1) {
-            el.classList.remove("locked");
+        if (phaseId === state.phase) {
+            section.style.display = "block";
+        } else {
+            section.style.display = "none";
         }
     });
 
-    // 🌧️ PHASE 4 EFFECT
+    // 🔥 UPDATE BARRES PHASE INDIVIDUELLES
+    const bar = document.getElementById(`phaseBar${state.phase}`);
+    const text = document.getElementById(`phasePercent${state.phase}`);
+
+    if (bar) bar.style.width = state.phaseProgress + "%";
+    if (text) text.textContent = state.phaseProgress + "%";
+
+    // 🌧️ EFFECT PHASE 4
     document.body.classList.toggle("phase-4", state.phase === 4);
 }
 
@@ -47,4 +42,4 @@ function applyState() {
 applyState();
 
 // live sync
-setInterval(applyState, 500);
+setInterval(applyState, 1000);
