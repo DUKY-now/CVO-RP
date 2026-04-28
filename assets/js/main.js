@@ -10,3 +10,14 @@ async function loadComponent(id, file) {
 // Charger les composants
 loadComponent("navbar", "/components/navbar.html");
 loadComponent("footer", "/components/footer.html");
+
+function setActiveLink() {
+    const links = document.querySelectorAll("nav a");
+    links.forEach(link => {
+        if (link.href === window.location.href) {
+            link.classList.add("active");
+        }
+    });
+}
+
+setTimeout(setActiveLink, 100);
