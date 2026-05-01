@@ -113,7 +113,7 @@ nav a.active {
     overflow: hidden;
 
     background: url("/assets/images/Fond_CVO.JPG") center/cover no-repeat;
-    filter: contrast(1.1) brightness(0.8);
+    /* filter: contrast(1.0) brightness(1.0); */
 }
 
 .overlay {
