@@ -34,8 +34,10 @@ if (state.progression > 80) {
     document.body.style.filter = "hue-rotate(20deg)";
 }
 
-document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', () => {
-        window.location.href = card.dataset.link;
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+            window.location.href = card.dataset.link;
+        });
     });
 });
