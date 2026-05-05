@@ -162,6 +162,7 @@ nav a.active {
     background: #111;
     padding: 20px;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 /* CTA */
