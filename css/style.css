@@ -162,6 +162,9 @@ nav a.active {
     background: #111;
     padding: 20px;
     border-radius: 10px;
+}
+
+.card[data-link] {
     cursor: pointer;
 }
 

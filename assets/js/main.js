@@ -36,11 +36,8 @@ if (typeof state !== "undefined") {
     }
 
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', () => {
-            window.location.href = card.dataset.link;
-        });
+document.querySelectorAll('.clickable').forEach(card => {
+    card.addEventListener('click', () => {
+        window.location.href = card.dataset.link;
     });
 });
