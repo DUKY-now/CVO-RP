@@ -409,3 +409,20 @@ body.phase-4::before {
     background: #8b0000;
     color: white;
 }
+
+.extra-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.reg-card.active .extra-content {
+    max-height: 200px;
+}
+
+.reg-card {
+    cursor: pointer;
+}

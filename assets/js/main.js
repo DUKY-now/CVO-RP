@@ -41,3 +41,7 @@ document.querySelectorAll('.clickable').forEach(card => {
         window.location.href = card.dataset.link;
     });
 });
+
+function toggleCard(card) {
+    card.classList.toggle("active");
+}
