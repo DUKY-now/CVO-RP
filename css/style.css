@@ -471,8 +471,14 @@ body.phase-4::before {
 
 /* SLIDER */
 .modal-slider {
-    flex: 1;
-    text-align: center;
+    width: 320px;      /* largeur fixe */
+    height: 480px;     /* plus haut que large = portrait */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .modal-slider img {
