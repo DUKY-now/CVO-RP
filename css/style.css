@@ -426,3 +426,77 @@ body.phase-4::before {
 .reg-card {
     cursor: pointer;
 }
+
+/* MODAL BACKGROUND */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* POPUP */
+.modal-content {
+    background: #111;
+    border: 1px solid #333;
+    padding: 20px;
+    width: 900px;
+    max-width: 95%;
+    border-radius: 10px;
+    position: relative;
+}
+
+/* CLOSE */
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    cursor: pointer;
+}
+
+/* LAYOUT */
+.modal-body {
+    display: flex;
+    gap: 20px;
+}
+
+/* TEXT */
+.modal-text {
+    flex: 1;
+}
+
+/* SLIDER */
+.modal-slider {
+    flex: 1;
+    text-align: center;
+}
+
+.modal-slider img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* CONTROLS */
+.slider-controls {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.slider-controls button {
+    background: #222;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* CLICKABLE CARD */
+.reg-card {
+    cursor: pointer;
+}
