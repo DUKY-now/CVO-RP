@@ -46,17 +46,17 @@
 <section class="regiments">
 
     <!-- INFANTERIE -->
-    <div class="reg-card" onclick="openModal({
-        title: '🪖 Infanterie',
-        desc: 'Force de frappe principale. Engagement direct.',
-        role: 'Première ligne, combat rapproché',
-        equip: 'Fusil d’assaut, armure standard',
-        images: [
-            '/assets/images/inf1.jpg',
-            '/assets/images/inf2.jpg',
-            '/assets/images/inf3.jpg'
-        ]
-    })">
+<div class="reg-card"
+onclick="openModalFromCard(this)"
+data-title="🪖 Infanterie"
+data-desc="Force de frappe principale. Engagement direct."
+data-role="Première ligne, combat rapproché"
+data-equip="Fusil d’assaut, armure standard"
+data-images='[
+"/assets/images/inf1.jpg",
+"/assets/images/inf2.jpg",
+"/assets/images/inf3.jpg"
+]'>
         <h3>🪖 Infanterie</h3>
         <p>Force de frappe principale. Engagement direct sur le terrain.</p>
     </div>
