@@ -1,0 +1,66 @@
+{
+  "activeTrame": "skyline",
+
+  "trames": [
+
+    {
+      "id": "skyline",
+      "nom": "Skyline Valley",
+
+      "contexte": "Après la bataille de la Tourbière, la Confrérie déploie ses forces dans une nouvelle région instable.",
+
+      "infoRegion": "Les communistes développent une technologie capable de modifier les êtres humains.",
+
+      "globalProgress": 35,
+
+      "phases": [
+
+        {
+          "id": 1,
+          "nom": "Reconnaissance",
+          "visible": true,
+          "progression": 70,
+
+          "publicDesc": "Exploration initiale de Skyline Valley.",
+
+          "staffDesc": "Découverte de la Skyline Valley (2 à 3 semaines)."
+        },
+
+        {
+          "id": 2,
+          "nom": "Installation",
+          "visible": true,
+          "progression": 25,
+
+          "publicDesc": "Déploiement et construction des avant-postes.",
+
+          "staffDesc": "Installation et reprise de zones stratégiques."
+        },
+
+        {
+          "id": 3,
+          "nom": "Mutation",
+          "visible": false,
+          "progression": 0,
+
+          "publicDesc": "Contenu verrouillé.",
+
+          "staffDesc": "Montée des tensions et exploration avancée."
+        }
+      ]
+    },
+
+    {
+      "id": "ancienne_guerre",
+      "nom": "Ancienne Guerre",
+
+      "contexte": "Ancienne campagne militaire.",
+
+      "infoRegion": "Anciennes données archivées.",
+
+      "globalProgress": 100,
+
+      "phases": []
+    }
+  ]
+}

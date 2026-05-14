@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>CONSOLE CVO</title>
+<link rel="icon" type="image/png" href="/assets/logo/Fav_Icon.png">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/pages/admin.css">
+</head>
+
+<body style="background:#000; color:#d4af37; font-family:Inter;">
+
+<!-- LOGIN -->
+<div id="login-box">
+    <h1>ACCÈS RESTREINT</h1>
+    <input type="password" id="pwd" placeholder="Mot de passe">
+    <button onclick="login()">Entrer</button>
+    <p id="error" style="color:red;"></p>
+</div>
+
+<!-- PANEL -->
+<!-- PANEL -->
+<div id="panel" style="display:none;" class="admin-panel">
+
+    <h1 class="admin-title">CONSOLE CVO</h1>
+
+    <!-- GRID PRINCIPAL -->
+    <div class="admin-grid">
+
+        <!-- TRAME -->
+        <div class="admin-card">
+            <h2>📍 Trame active</h2>
+            <select id="trameSelect">
+                <option value="trame1">Trame 1</option>
+                <option value="trame2">Trame 2</option>
+                <option value="trame3">Trame 3</option>
+            </select>
+        </div>
+
+        <!-- GLOBAL -->
+        <div class="admin-card">
+            <h2>📊 Progression globale</h2>
+
+            <input type="range" id="globalInput" min="0" max="100">
+            <input type="number" id="globalRange" min="0" max="100">
+
+            <div class="admin-value">
+                <span>Valeur :</span>
+                <strong id="globalPreview">0%</strong>
+            </div>
+        </div>
+
+        <!-- PHASE -->
+        <div class="admin-card">
+            <h2>🎯 Phase actuelle</h2>
+
+            <select id="phase">
+                <option value="1">Phase 1</option>
+                <option value="2">Phase 2</option>
+                <option value="3">Phase 3</option>
+                <option value="4">Phase 4</option>
+                <option value="5">Phase 5</option>
+            </select>
+
+            <br><br>
+
+            <label>Progression phase</label>
+
+            <input type="range" id="phaseInput" min="0" max="100">
+            <input type="number" id="phaseRange" min="0" max="100">
+
+            <div class="admin-value">
+                <span>Valeur :</span>
+                <strong id="phasePreview">0%</strong>
+            </div>
+        </div>
+
+        <!-- VISIBILITÉ -->
+        <div class="admin-card full">
+            <h2>👁 Visibilité des phases</h2>
+
+            <div class="check-grid">
+                <label><input type="checkbox" id="show1"> Phase 1</label>
+                <label><input type="checkbox" id="show2"> Phase 2</label>
+                <label><input type="checkbox" id="show3"> Phase 3</label>
+                <label><input type="checkbox" id="show4"> Phase 4</label>
+                <label><input type="checkbox" id="show5"> Phase 5</label>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="admin-card full center">
+            <button onclick="save()" class="btn-admin">
+                💾 Sauvegarder
+            </button>
+
+            <div class="admin-links">
+                <a href="/pages/trames.html">Voir Trames</a>
+                <a href="/index.html">Accueil</a>
+                <a href="/pages/Phase_Staff.html">Scénario</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = "admin";
+
+function login() {
+    const input = document.getElementById("pwd").value;
+
+    if (input === ADMIN_PASSWORD) {
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+        loadState();
+    } else {
+        document.getElementById("error").innerText = "Accès refusé";
+    }
+}
+
+// =====================
+// SLIDERS SYNC
+// =====================
+
+const g1 = document.getElementById("globalInput");
+const g2 = document.getElementById("globalRange");
+
+g1.oninput = () => g2.value = g1.value;
+
+const p1 = document.getElementById("phaseInput");
+const p2 = document.getElementById("phaseRange");
+
+p1.oninput = () => p2.value = p1.value;
+
+// PREVIEW LIVE GLOBAL
+g1.oninput = () => {
+    g2.value = g1.value;
+    document.getElementById("globalPreview").textContent = g1.value + "%";
+};
+
+g2.oninput = () => {
+    g1.value = g2.value;
+    document.getElementById("globalPreview").textContent = g2.value + "%";
+};
+
+// PREVIEW LIVE PHASE
+p1.oninput = () => {
+    p2.value = p1.value;
+    document.getElementById("phasePreview").textContent = p1.value + "%";
+};
+
+p2.oninput = () => {
+    p1.value = p2.value;
+    document.getElementById("phasePreview").textContent = p2.value + "%";
+};
+// =====================
+// LOAD STATE
+// =====================
+
+function loadState() {
+    const currentTrame = localStorage.getItem("active_trame") || "trame1";
+    const allData = JSON.parse(localStorage.getItem("cvo_trames")) || {};
+
+    const state = allData[currentTrame] || {
+        phase: 1,
+        progression: 0,
+        phaseProgress: 0,
+        visiblePhases: {
+            1: true,
+            2: true,
+            3: false,
+            4: false,
+            5: false
+        }
+    };
+
+    document.getElementById("trameSelect").value = currentTrame;
+
+    document.getElementById("phase").value = state.phase;
+    document.getElementById("globalInput").value = state.progression;
+    document.getElementById("globalRange").value = state.progression;
+    document.getElementById("phaseInput").value = state.phaseProgress;
+    document.getElementById("phaseRange").value = state.phaseProgress;
+
+    document.getElementById("show1").checked = state.visiblePhases?.[1];
+    document.getElementById("show2").checked = state.visiblePhases?.[2];
+    document.getElementById("show3").checked = state.visiblePhases?.[3];
+    document.getElementById("show4").checked = state.visiblePhases?.[4];
+    document.getElementById("show5").checked = state.visiblePhases?.[5];
+}
+
+// =====================
+// SAVE (FIX IMPORTANT)
+// =====================
+
+function save() {
+    const currentTrame = document.getElementById("trameSelect").value;
+
+    const allData = JSON.parse(localStorage.getItem("cvo_trames")) || {};
+
+    allData[currentTrame] = {
+        phase: Number(document.getElementById("phase").value),
+        progression: Number(document.getElementById("globalInput").value),
+        phaseProgress: Number(document.getElementById("phaseInput").value),
+        visiblePhases: {
+            1: document.getElementById("show1").checked,
+            2: document.getElementById("show2").checked,
+            3: document.getElementById("show3").checked,
+            4: document.getElementById("show4").checked,
+            5: document.getElementById("show5").checked
+        }
+    };
+
+    localStorage.setItem("cvo_trames", JSON.stringify(allData));
+    localStorage.setItem("active_trame", currentTrame);
+
+    // 🔥 IMPORTANT FIX
+    window.dispatchEvent(new Event("storage"));
+
+    alert("Trame sauvegardée");
+}
+
+// =====================
+// SWITCH TRAME FIX
+// =====================
+
+document.getElementById("trameSelect").addEventListener("change", (e) => {
+    localStorage.setItem("active_trame", e.target.value);
+    window.dispatchEvent(new Event("storage"));
+    loadState();
+});
+</script>
+
+</body>
+</html>

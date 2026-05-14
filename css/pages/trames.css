@@ -1,29 +1,137 @@
-.phase-block {
-    opacity: 0.3;
-    transition: 0.3s;
+/* =========================
+   HERO
+========================= */
+
+.trame-hero {
+    text-align: center;
+    padding: 80px 20px 40px;
 }
 
-.phase-block.active-phase {
-    opacity: 1;
+.trame-hero h1 {
+    font-size: 42px;
+    letter-spacing: 2px;
 }
+
+.trame-hero p {
+    opacity: 0.7;
+}
+
+/* =========================
+   SELECTOR
+========================= */
+
+.trame-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    margin: 20px 0 40px;
+}
+
+.trame-selector label {
+    opacity: 0.7;
+}
+
+.trame-selector select {
+    padding: 10px 15px;
+    border-radius: 8px;
+
+    background: #111;
+    color: #d4af37;
+
+    border: 1px solid #333;
+
+    cursor: pointer;
+}
+
+/* =========================
+   GLOBAL PROGRESS
+========================= */
+
+.trame-global {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.global-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    opacity: 0.8;
+}
+
+/* =========================
+   BAR
+========================= */
 
 .progress-bar {
     width: 100%;
-    height: 10px;
-
+    height: 12px;
     background: #1a1a1a;
-
-    border-radius: 10px;
-
+    border-radius: 999px;
     overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
+    background: linear-gradient(90deg, #8b0000, #d4af37);
+    transition: width 0.4s ease;
+}
 
-    background: linear-gradient(
-        90deg,
-        var(--red),
-        var(--gold)
-    );
+/* =========================
+   CONTAINER
+========================= */
+
+#trame-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* =========================
+   PHASE CARD (NEW UI)
+========================= */
+
+.phase-card {
+    background: linear-gradient(145deg, #121212, #1a1a1a);
+    border: 1px solid #2a2a2a;
+
+    padding: 20px;
+    margin-bottom: 20px;
+
+    border-radius: 12px;
+
+    transition: 0.3s;
+}
+
+.phase-card:hover {
+    border-color: #8b0000;
+    transform: translateY(-3px);
+}
+
+.phase-card.active {
+    border-color: #d4af37;
+    box-shadow: 0 0 15px rgba(212,175,55,0.1);
+}
+
+.phase-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.phase-title h3 {
+    font-size: 18px;
+}
+
+.phase-card p {
+    opacity: 0.8;
+    margin-top: 10px;
+}
+
+/* HIDDEN PHASE EFFECT */
+.hidden {
+    display: none;
 }
