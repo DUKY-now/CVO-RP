@@ -1,0 +1,18 @@
+.timeline {
+    display: flex;
+    flex-direction: column;
+
+    gap: 30px;
+
+    padding: 60px 40px;
+}
+
+.timeline-item {
+    background: #111;
+
+    border-left: 3px solid var(--purple);
+
+    padding: 20px;
+
+    border-radius: 5px;
+}
