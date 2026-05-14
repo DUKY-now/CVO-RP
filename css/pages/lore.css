@@ -16,3 +16,24 @@
 
     border-radius: 5px;
 }
+
+.sub-hero {
+    position: relative;
+
+    height: 25vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    background: url("/assets/images/background.jpg") center/cover no-repeat;
+
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}

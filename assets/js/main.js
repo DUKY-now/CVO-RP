@@ -65,7 +65,7 @@ function openModalFromCard(el) {
     const data = {
         title: el.dataset.title,
         desc: el.dataset.desc,
-        role: el.dataset.role,
+        armure: el.dataset.armure,
         equip: el.dataset.equip,
         images: JSON.parse(el.dataset.images || "[]")
     };
@@ -80,7 +80,7 @@ function openModal(data) {
 
     document.getElementById("modal-title").textContent = data.title || "";
     document.getElementById("modal-desc").textContent = data.desc || "";
-    document.getElementById("modal-role").textContent = data.role || "";
+    document.getElementById("modal-armure").textContent = data.armure || "";
     document.getElementById("modal-equip").textContent = data.equip || "";
 
     images = Array.isArray(data.images) ? data.images : [];
