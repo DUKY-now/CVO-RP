@@ -48,7 +48,7 @@ function unlockMission(id, code) {
 async function render() {
 
     const all = await fetchData();
-
+console.log(all);
     const container =
         document.getElementById("mission-container");
 
