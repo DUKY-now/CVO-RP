@@ -26,12 +26,13 @@
 
         <!-- CREATE TRAME -->
         <div class="admin-card">
-            <h2>➕ Créer une trame</h2>
-            <input id="newTrameName" placeholder="Nom de la trame">
+            <h2>➕ Trames</h2>
+            <input id="newTrameName" placeholder="Nom trame">
             <button onclick="createTrame()">Créer</button>
+            <button onclick="deleteTrame()" class="danger">🗑 Supprimer</button>
         </div>
 
-        <!-- SELECT TRAME -->
+        <!-- TRAME SELECT -->
         <div class="admin-card">
             <h2>📍 Trame active</h2>
             <select id="trameSelect"></select>
@@ -42,29 +43,25 @@
             <h2>📊 Progression globale</h2>
             <input type="range" id="globalInput" min="0" max="100">
             <input type="number" id="globalRange" min="0" max="100">
-
-            <div class="admin-value">
-                <strong id="globalPreview">0%</strong>
-            </div>
+            <div><strong id="globalPreview">0%</strong></div>
         </div>
 
-        <!-- PHASE ACTIVE -->
+        <!-- PHASE -->
         <div class="admin-card">
             <h2>🎯 Phase active</h2>
+
             <select id="phase"></select>
 
             <h3>Progression phase</h3>
             <input type="range" id="phaseInput" min="0" max="100">
             <input type="number" id="phaseRange" min="0" max="100">
 
-            <div class="admin-value">
-                <strong id="phasePreview">0%</strong>
-            </div>
+            <div><strong id="phasePreview">0%</strong></div>
 
-            <button onclick="addPhase()">➕ Ajouter une phase</button>
+            <button onclick="addPhase()">➕ Ajouter phase</button>
         </div>
 
-        <!-- VISIBILITÉ -->
+        <!-- PHASE LIST -->
         <div class="admin-card full">
             <h2>👁 Phases</h2>
             <div id="phaseList"></div>
@@ -79,17 +76,20 @@
 </div>
 
 <script>
+
 const API = "https://cvo-trames-api.dukynow.workers.dev/api/trames";
 
-/* ================= AUTH ================= */
+/* ================= LOGIN ================= */
 function login() {
     const input = document.getElementById("pwd").value;
 
-    if (input !== "admin") return;
+    if (input !== "admin") {
+        document.getElementById("error").innerText = "Accès refusé";
+        return;
+    }
 
     document.getElementById("login-box").style.display = "none";
     document.getElementById("panel").style.display = "block";
-
     loadState();
 }
 
@@ -98,8 +98,66 @@ async function getAll() {
     return await (await fetch(API)).json();
 }
 
+/* ================= SELECTOR ================= */
+function initSelector(all, current) {
+    const sel = document.getElementById("trameSelect");
+    sel.innerHTML = "";
+
+    Object.keys(all).forEach(k => {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = all[k].nom || k;
+        sel.appendChild(opt);
+    });
+
+    sel.value = current;
+
+    sel.onchange = () => {
+        localStorage.setItem("active_trame", sel.value);
+        loadState();
+    };
+}
+
+/* ================= LOAD ================= */
+async function loadState() {
+
+    const all = await getAll();
+    const current = localStorage.getItem("active_trame")
+        || Object.keys(all)[0];
+
+    if (!all[current]) return;
+
+    initSelector(all, current);
+
+    const state = all[current];
+
+    document.getElementById("phase").innerHTML = "";
+
+    state.phases.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.nom || ("Phase " + p.id);
+        document.getElementById("phase").appendChild(opt);
+    });
+
+    document.getElementById("phase").value = state.phase;
+
+    globalInput.value = state.progression;
+    globalRange.value = state.progression;
+    globalPreview.textContent = state.progression + "%";
+
+    const active = state.phases.find(p => p.id == state.phase);
+
+    phaseInput.value = active?.progress || 0;
+    phaseRange.value = active?.progress || 0;
+    phasePreview.textContent = (active?.progress || 0) + "%";
+
+    renderPhaseList(state);
+}
+
 /* ================= CREATE TRAME ================= */
 async function createTrame() {
+
     const name = document.getElementById("newTrameName").value.trim();
     if (!name) return;
 
@@ -126,66 +184,38 @@ async function createTrame() {
     loadState();
 }
 
-/* ================= LOAD ================= */
-async function loadState() {
+/* ================= DELETE TRAME ================= */
+async function deleteTrame() {
+
+    const current = document.getElementById("trameSelect").value;
 
     const all = await getAll();
-    const current = localStorage.getItem("active_trame") || Object.keys(all)[0];
 
-    initSelector(all, current);
+    if (!all[current]) return;
 
-    const state = all[current];
-    if (!state) return;
+    if (!confirm("Supprimer " + current + " ?")) return;
 
-    // phase selector
-    const phaseSel = document.getElementById("phase");
-    phaseSel.innerHTML = "";
+    delete all[current];
 
-    state.phases.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = p.id;
-        opt.textContent = p.nom || ("Phase " + p.id);
-        phaseSel.appendChild(opt);
+    await fetch(API, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(all)
     });
 
-    phaseSel.value = state.phase;
+    const keys = Object.keys(all);
+    if (keys.length) {
+        localStorage.setItem("active_trame", keys[0]);
+    }
 
-    // sliders
-    globalInput.value = state.progression;
-    globalRange.value = state.progression;
-
-    const active = state.phases.find(p => p.id == state.phase);
-    phaseInput.value = active?.progress || 0;
-    phaseRange.value = active?.progress || 0;
-
-    renderPhaseList(state);
-}
-
-/* ================= PHASE LIST ================= */
-function renderPhaseList(state) {
-    const container = document.getElementById("phaseList");
-    container.innerHTML = "";
-
-    state.phases.forEach(p => {
-
-        const div = document.createElement("div");
-        div.style.marginBottom = "10px";
-
-        div.innerHTML = `
-            <input value="${p.nom}" onchange="p.nom=this.value">
-            <input type="checkbox" ${p.visible ? "checked":""}
-                onchange="p.visible=this.checked">
-            <span>Phase ${p.id}</span>
-        `;
-
-        container.appendChild(div);
-    });
+    loadState();
 }
 
 /* ================= ADD PHASE ================= */
 async function addPhase() {
+
     const all = await getAll();
-    const current = trameSelect.value;
+    const current = document.getElementById("trameSelect").value;
 
     const state = all[current];
 
@@ -207,24 +237,60 @@ async function addPhase() {
     loadState();
 }
 
-/* ================= SELECTOR ================= */
-function initSelector(all, current) {
-    const sel = trameSelect;
-    sel.innerHTML = "";
+/* ================= PHASE LIST ================= */
+function renderPhaseList(state) {
 
-    Object.keys(all).forEach(k => {
-        const opt = document.createElement("option");
-        opt.value = k;
-        opt.textContent = all[k].nom || k;
-        sel.appendChild(opt);
+    const c = document.getElementById("phaseList");
+    c.innerHTML = "";
+
+    state.phases.forEach(p => {
+
+        const div = document.createElement("div");
+
+        div.innerHTML = `
+            <input value="${p.nom}" onchange="updatePhaseName(${p.id}, this.value)">
+            <input type="checkbox" ${p.visible ? "checked":""}
+                onchange="togglePhase(${p.id}, this.checked)">
+            <button onclick="deletePhase(${p.id})">🗑</button>
+        `;
+
+        c.appendChild(div);
     });
+}
 
-    sel.value = current;
+/* ================= PHASE EDIT ================= */
+function updatePhaseName(id, value) {
+    getAll().then(all => {
+        const current = trameSelect.value;
+        const state = all[current];
 
-    sel.onchange = () => {
-        localStorage.setItem("active_trame", sel.value);
-        loadState();
-    };
+        const p = state.phases.find(x => x.id === id);
+        if (p) p.nom = value;
+
+        saveAll(all);
+    });
+}
+
+function togglePhase(id, val) {
+    getAll().then(all => {
+        const state = all[trameSelect.value];
+
+        const p = state.phases.find(x => x.id === id);
+        if (p) p.visible = val;
+
+        saveAll(all);
+    });
+}
+
+async function deletePhase(id) {
+
+    const all = await getAll();
+    const state = all[trameSelect.value];
+
+    state.phases = state.phases.filter(p => p.id !== id);
+
+    await saveAll(all);
+    loadState();
 }
 
 /* ================= SAVE ================= */
@@ -241,13 +307,17 @@ async function save() {
     const active = state.phases.find(p => p.id == state.phase);
     if (active) active.progress = +phaseInput.value;
 
+    await saveAll(all);
+
+    alert("Sauvegardé");
+}
+
+async function saveAll(data) {
     await fetch(API, {
         method: "POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(all)
+        body: JSON.stringify(data)
     });
-
-    alert("Sauvegardé");
 }
 
 /* ================= SLIDERS ================= */
@@ -270,6 +340,9 @@ phaseRange.oninput = e => {
     phaseInput.value = e.target.value;
     phasePreview.textContent = e.target.value + "%";
 };
+
+/* ================= START ================= */
+document.addEventListener("DOMContentLoaded", loadState);
 
 </script>
 
