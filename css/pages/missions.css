@@ -1,0 +1,62 @@
+
+body{
+    background:#000;
+    color:#d4af37;
+    font-family:Inter;
+    padding:20px;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+.mission-card{
+    background:#0a0a0a;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.meta{
+    opacity:.6;
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+img{
+    max-width:300px;
+    border-radius:8px;
+    margin-top:10px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    background:#111;
+    border:1px solid #333;
+    color:#fff;
+}
+
+button{
+    padding:10px 15px;
+    background:#d4af37;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.locked{
+    opacity:.7;
+    border:1px dashed #555;
+}
+
+.empty{
+    opacity:.5;
+}
+.back-btn-center{
+    display:flex;
+    justify-content:center;
+    margin-top:40px;
+}
