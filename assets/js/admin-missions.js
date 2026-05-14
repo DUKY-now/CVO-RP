@@ -132,6 +132,46 @@ async function addNote() {
     await renderMissions();
 }
 
+/* ================= MODIFY MISSION ================= */
+
+async function editMission(id) {
+
+    const missions = await getMissions();
+
+    if (!missions[id]) return;
+
+    missions[id].titre =
+        document.getElementById("title-" + id).value;
+
+    missions[id].content =
+        document.getElementById("content-" + id).value;
+
+    missions[id].code =
+        document.getElementById("code-" + id).value;
+
+    missions[id].unlockAt =
+        document.getElementById("time-" + id).value;
+
+    await saveMissions(missions);
+
+    alert("Mission modifiée ✔");
+}
+
+/* ================= DELETE MISSION ================= */
+
+async function deleteMission(id) {
+
+    if (!confirm("Supprimer cette mission ?")) return;
+
+    const missions = await getMissions();
+
+    delete missions[id];
+
+    await saveMissions(missions);
+
+    await renderMissions();
+}
+
 /* ================= RENDER MISSIONS ================= */
 
 async function renderMissions() {
@@ -152,11 +192,44 @@ async function renderMissions() {
         const div = document.createElement("div");
         div.className = "card";
 
-        div.innerHTML = `
-            <h3>${m.titre}</h3>
+div.innerHTML = `
+    <h3>${m.titre}</h3>
 
-            <button onclick="selectMission('${m.id}')">📌 Éditer cette mission</button>
-        `;
+    <input
+        id="title-${m.id}"
+        value="${m.titre || ""}"
+        placeholder="Titre">
+
+    <textarea
+        id="content-${m.id}"
+        placeholder="Contenu mission">${m.content || ""}</textarea>
+
+    <input
+        id="code-${m.id}"
+        value="${m.code || ""}"
+        placeholder="Code RP">
+
+    <input
+        id="time-${m.id}"
+        type="datetime-local"
+        value="${m.unlockAt || ""}">
+
+    <br><br>
+
+    <button onclick="editMission('${m.id}')">
+        💾 Modifier
+    </button>
+
+    <button onclick="toggleMission('${m.id}')">
+        ${m.visible
+            ? "🔴 Masquer joueurs"
+            : "🟢 Afficher joueurs"}
+    </button>
+
+    <button onclick="deleteMission('${m.id}')">
+        🗑 Supprimer
+    </button>
+`;
 
         container.appendChild(div);
     });
