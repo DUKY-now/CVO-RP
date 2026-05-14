@@ -1,96 +1,70 @@
-// =========================
-// STORAGE
-// =========================
+const API = "https://cvo-trames-api.dukynow.workers.dev/api/trames";
 
-async function getAllTrames() {
+// =========================
+// ACTIVE TRAME
+// =========================
+function getActiveTrame() {
+    return localStorage.getItem("active_trame") || "trame1";
+}
+
+// =========================
+// FETCH DATA
+// =========================
+async function fetchTrames() {
     try {
-        const res = await fetch("https://cvo-trames-api.dukynow.workers.dev/api/trames");
+        const res = await fetch(API);
         return await res.json();
-    } catch {
+    } catch (e) {
+        console.error("API ERROR", e);
         return {};
     }
 }
-// =========================
-// STATE
-// =========================
-
-function getDefaultState() {
-    return {
-        phase: 1,
-        progression: 0,
-        phaseProgress: 0,
-        visiblePhases: {
-            1: true,
-            2: true,
-            3: true,
-            4: true,
-            5: true
-        }
-    };
-}
-
-function getState() {
-    const all = getAllTrames();
-    const active = getActiveTrame();
-
-    const base = getDefaultState();
-    const trame = all?.[active];
-
-    if (!trame || typeof trame !== "object") return base;
-
-    return {
-        ...base,
-        ...trame,
-        visiblePhases: {
-            ...base.visiblePhases,
-            ...(trame.visiblePhases || {})
-        }
-    };
-}
 
 // =========================
-// SELECTOR
+// INIT DROPDOWN
 // =========================
-
-function initTrameSelector() {
+async function initTrameSelector(data) {
     const selector = document.getElementById("trameSelect");
     if (!selector) return;
 
-    const all = getAllTrames();
+    selector.innerHTML = "";
+
+    Object.keys(data || {}).forEach(key => {
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = key;
+        selector.appendChild(opt);
+    });
+
     const active = getActiveTrame();
-
-    selector.innerHTML = Object.keys(all)
-        .map(key => `<option value="${key}">${key}</option>`)
-        .join("");
-
     selector.value = active;
 
     selector.onchange = (e) => {
         localStorage.setItem("active_trame", e.target.value);
-        renderTrames();
+        render();
     };
 }
 
 // =========================
-// RENDER
+// RENDER PAGE
 // =========================
-
-async function renderTrames() {
-    const all = await getAllTrames();
+async function render() {
+    const all = await fetchTrames();
     const active = getActiveTrame();
 
-    const state = all[active] || {
-        phase: 1,
-        progression: 0,
-        phaseProgress: 0,
-        visiblePhases: { 1:true,2:true,3:true,4:true,5:true }
-    };
+    const state = all[active];
 
     const container = document.getElementById("trame-container");
     if (!container) return;
 
+    if (!state) {
+        container.innerHTML = "<p>Aucune trame trouvée</p>";
+        return;
+    }
+
     let html = "";
 
+    // GLOBAL
     html += `
         <section class="section">
             <h2>📊 Progression globale</h2>
@@ -101,6 +75,7 @@ async function renderTrames() {
         </section>
     `;
 
+    // PHASES
     for (let i = 1; i <= 5; i++) {
 
         if (!state.visiblePhases?.[i]) continue;
@@ -122,20 +97,13 @@ async function renderTrames() {
     }
 
     container.innerHTML = html;
+
+    await initTrameSelector(all);
 }
 
 // =========================
-// INIT
+// START
 // =========================
+document.addEventListener("DOMContentLoaded", render);
 
-document.addEventListener("DOMContentLoaded", renderTrames);
-setInterval(renderTrames, 5000);
-
-// =========================
-// LIVE SYNC (admin + multi-tab)
-// =========================
-
-window.addEventListener("storage", () => {
-    renderTrames();
-    initTrameSelector();
-});
+setInterval(render, 5000);
