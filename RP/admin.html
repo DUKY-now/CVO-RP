@@ -221,31 +221,99 @@ async function loadState() {
 // SAVE (FIX IMPORTANT)
 // =====================
 
-function save() {
-    const currentTrame = document.getElementById("trameSelect").value;
+async function save() {
 
-    const allData = JSON.parse(localStorage.getItem("cvo_trames")) || {};
+    const currentTrame =
+        document.getElementById(
+            "trameSelect"
+        ).value;
+
+    // =========================
+    // GET CLOUD DATA
+    // =========================
+
+    const response = await fetch(
+        "https://cvo-trames-api.dukynow.workers.dev/api/trames"
+    );
+
+    const allData = await response.json();
+
+    // =========================
+    // UPDATE DATA
+    // =========================
 
     allData[currentTrame] = {
-        phase: Number(document.getElementById("phase").value),
-        progression: Number(document.getElementById("globalInput").value),
-        phaseProgress: Number(document.getElementById("phaseInput").value),
+
+        phase: Number(
+            document.getElementById(
+                "phase"
+            ).value
+        ),
+
+        progression: Number(
+            document.getElementById(
+                "globalInput"
+            ).value
+        ),
+
+        phaseProgress: Number(
+            document.getElementById(
+                "phaseInput"
+            ).value
+        ),
+
         visiblePhases: {
-            1: document.getElementById("show1").checked,
-            2: document.getElementById("show2").checked,
-            3: document.getElementById("show3").checked,
-            4: document.getElementById("show4").checked,
-            5: document.getElementById("show5").checked
+
+            1: document.getElementById(
+                "show1"
+            ).checked,
+
+            2: document.getElementById(
+                "show2"
+            ).checked,
+
+            3: document.getElementById(
+                "show3"
+            ).checked,
+
+            4: document.getElementById(
+                "show4"
+            ).checked,
+
+            5: document.getElementById(
+                "show5"
+            ).checked
         }
     };
 
-    localStorage.setItem("cvo_trames", JSON.stringify(allData));
-    localStorage.setItem("active_trame", currentTrame);
+    console.log(allData);
 
-    // 🔥 IMPORTANT FIX
-    window.dispatchEvent(new Event("storage"));
+    // =========================
+    // SAVE TO WORKER
+    // =========================
 
-    alert("Trame sauvegardée");
+    await fetch(
+        "https://cvo-trames-api.dukynow.workers.dev/api/trames",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify(allData)
+        }
+    );
+
+    console.log("SAVE OK");
+
+    localStorage.setItem(
+        "active_trame",
+        currentTrame
+    );
+
+    alert("Sauvegardé dans Cloudflare");
 }
 
 // =====================
