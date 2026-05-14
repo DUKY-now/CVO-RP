@@ -97,7 +97,7 @@ async function createMission() {
         trame,
         phase,
         titre: document.getElementById("missionName").value,
-        visible: false,
+        visible: true,
 
         notes: [],
         preuves: []
@@ -119,7 +119,7 @@ async function addNote() {
     missions[current].notes.push({
         titre: document.getElementById("title").value,
         contenu: document.getElementById("content").value,
-        visible: false,
+        visible: true,
         unlock: {
             type: document.getElementById("codeUnlock").value ? "code" : null,
             value: document.getElementById("codeUnlock").value || null,
