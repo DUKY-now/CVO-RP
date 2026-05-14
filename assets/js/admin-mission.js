@@ -89,16 +89,44 @@ async function createMission() {
 
     const id = "mission_" + Date.now();
 
+    const trame = document.getElementById("trameSelect").value;
+    const phase = document.getElementById("phaseSelect").value;
+
     missions[id] = {
         id,
-        trame: document.getElementById("trameSelect").value,
-        phase: document.getElementById("phaseSelect").value,
+        trame,
+        phase,
         titre: document.getElementById("missionName").value,
-        content: "",
-        code: "",
-        unlockAt: "",
-        visible: false
+        visible: false,
+
+        notes: [],
+        preuves: []
     };
+
+    await saveMissions(missions);
+    await renderMissions();
+}
+
+/* ================== add note ========================*/ 
+
+async function addNote() {
+
+    const missions = await getMissions();
+    const current = document.getElementById("notesList").dataset.mission;
+
+    if (!missions[current]) return;
+
+    missions[current].notes.push({
+        titre: document.getElementById("title").value,
+        contenu: document.getElementById("content").value,
+        visible: false,
+        unlock: {
+            type: document.getElementById("codeUnlock").value ? "code" : null,
+            value: document.getElementById("codeUnlock").value || null,
+            time: document.getElementById("unlockTime").value || null
+        },
+        media: []
+    });
 
     await saveMissions(missions);
     await renderMissions();
@@ -127,19 +155,16 @@ async function renderMissions() {
         div.innerHTML = `
             <h3>${m.titre}</h3>
 
-            <textarea id="content-${m.id}">${m.content || ""}</textarea>
-
-            <button onclick="saveMission('${m.id}')">💾 Sauvegarder</button>
-
-            <button onclick="toggleMission('${m.id}')">
-                ${m.visible ? "🔴 Masquer joueurs" : "🟢 Afficher joueurs"}
-            </button>
+            <button onclick="selectMission('${m.id}')">📌 Éditer cette mission</button>
         `;
 
         container.appendChild(div);
     });
 }
 
+function selectMission(id) {
+    document.getElementById("notesList").dataset.mission = id;
+}
 /* ================= SAVE MISSION ================= */
 
 async function saveMission(id) {

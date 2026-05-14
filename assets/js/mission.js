@@ -1,43 +1,55 @@
 const API = "https://cvo-trames-api.dukynow.workers.dev/api/missions";
 
+/* ================= FETCH ================= */
+
 async function fetchData() {
-    return await (await fetch(API)).json();
+    try {
+        const res = await fetch(API + "?t=" + Date.now());
+        const data = await res.json();
+        return data || {};
+    } catch (e) {
+        console.error("FETCH ERROR", e);
+        return {};
+    }
 }
+
+/* ================= ACTIVE MISSION ================= */
 
 function getActive() {
-    return localStorage.getItem("active_mission") || "mission1";
+    return localStorage.getItem("active_mission") || null;
 }
 
-/* ================= UNLOCK CHECK ================= */
+/* ================= SELECTOR ================= */
 
-function canUnlock(note) {
+function initSelector(all) {
 
-    if (note.visible) return true;
+    const container = document.getElementById("mission-selector");
+    if (!container) return;
 
-    // 🔐 CODE
-    if (note.unlock?.type === "code") {
-        const input = prompt("Code requis pour débloquer :");
-        if (input === note.unlock.value) {
-            note.visible = true;
-            return true;
-        }
+    container.innerHTML = "";
+
+    Object.keys(all).forEach(key => {
+
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = all[key].titre || key;
+
+        container.appendChild(opt);
+    });
+
+    let active = getActive();
+
+    if (!active || !all[active]) {
+        active = Object.keys(all)[0];
+        localStorage.setItem("active_mission", active);
     }
 
-    return false;
-}
+    container.value = active;
 
-/* ================= TIME UNLOCK ================= */
-
-function checkTime(note) {
-
-    if (!note.unlockAt) return;
-
-    const now = Date.now();
-    const unlockTime = new Date(note.unlockAt).getTime();
-
-    if (now >= unlockTime) {
-        note.visible = true;
-    }
+    container.onchange = () => {
+        localStorage.setItem("active_mission", container.value);
+        render();
+    };
 }
 
 /* ================= RENDER ================= */
@@ -45,54 +57,79 @@ function checkTime(note) {
 async function render() {
 
     const all = await fetchData();
-    const mission = all[getActive()];
+
+    initSelector(all);
+
+    const active = getActive();
+    const mission = all[active];
 
     const container = document.getElementById("mission-container");
 
+    if (!container) return;
+
     if (!mission) {
-        container.innerHTML = "<p>Aucune mission</p>";
+        container.innerHTML = "<p>Aucune mission disponible</p>";
         return;
     }
 
-    let html = `<h2>${mission.nom}</h2>`;
+    let html = "";
 
-    mission.notes.forEach(note => {
+    /* ================= HEADER ================= */
 
-        checkTime(note);
+    html += `
+        <h2>${mission.titre}</h2>
+        <p style="opacity:0.6;">${mission.trame || ""} / Phase ${mission.phase || ""}</p>
+        <hr>
+    `;
 
-        const unlocked = canUnlock(note);
+    /* ================= NOTES ================= */
 
-        html += `
-            <div class="card ${note.visible ? "" : "locked"}">
+    if (Array.isArray(mission.notes)) {
 
-                <h3>${note.titre}</h3>
+        mission.notes.forEach(note => {
 
-                <p>${note.visible ? note.contenu : "🔒 Contenu verrouillé"}</p>
+            html += `
+                <div class="card ${note.visible ? "" : "locked"}">
 
-                ${renderMedia(note)}
+                    <h3>${note.titre}</h3>
 
-            </div>
-        `;
-    });
+                    <p>
+                        ${note.visible ? note.contenu : "🔒 Contenu verrouillé"}
+                    </p>
 
-    html += `<hr><h3>📁 Preuves</h3>`;
+                    ${renderMedia(note)}
 
-    mission.preuves?.forEach(p => {
-        html += `
-            <div class="card">
-                <h4>${p.titre}</h4>
-                <p>${p.description}</p>
-                ${p.image ? `<img src="${p.image}" style="max-width:200px;">` : ""}
-            </div>
-        `;
-    });
+                </div>
+            `;
+        });
+    }
+
+    /* ================= PREUVES ================= */
+
+    if (Array.isArray(mission.preuves) && mission.preuves.length > 0) {
+
+        html += `<hr><h3>📁 Preuves</h3>`;
+
+        mission.preuves.forEach(p => {
+
+            html += `
+                <div class="card">
+                    <h4>${p.titre}</h4>
+                    <p>${p.description}</p>
+                    ${p.image ? `<img src="${p.image}" style="max-width:250px;">` : ""}
+                </div>
+            `;
+        });
+    }
 
     container.innerHTML = html;
 }
 
+/* ================= MEDIA ================= */
+
 function renderMedia(note) {
 
-    if (!note.media) return "";
+    if (!Array.isArray(note.media)) return "";
 
     return note.media.map(m => {
 
@@ -108,6 +145,8 @@ function renderMedia(note) {
 
     }).join("");
 }
+
+/* ================= INIT ================= */
 
 document.addEventListener("DOMContentLoaded", render);
 setInterval(render, 5000);
