@@ -74,7 +74,6 @@
 
     </div>
 </div>
-
 <script>
 
 const API = "https://cvo-trames-api.dukynow.workers.dev/api/trames";
@@ -95,7 +94,17 @@ function login() {
 
 /* ================= FETCH ================= */
 async function getAll() {
-    return await (await fetch(API)).json();
+    const res = await fetch(API + "?t=" + Date.now());
+    return await res.json();
+}
+
+/* ================= SAVE CORE ================= */
+async function saveAll(data) {
+    await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
 }
 
 /* ================= SELECTOR ================= */
@@ -122,30 +131,41 @@ function initSelector(all, current) {
 async function loadState() {
 
     const all = await getAll();
-    const current = localStorage.getItem("active_trame")
-        || Object.keys(all)[0];
+    const keys = Object.keys(all);
 
-    if (!all[current]) return;
+    if (keys.length === 0) return;
+
+    let current = localStorage.getItem("active_trame");
+
+    if (!current || !all[current]) {
+        current = keys[0];
+        localStorage.setItem("active_trame", current);
+    }
 
     initSelector(all, current);
 
     const state = all[current];
+    if (!state) return;
 
-    document.getElementById("phase").innerHTML = "";
+    // PHASE SELECT
+    const phaseSel = document.getElementById("phase");
+    phaseSel.innerHTML = "";
 
     state.phases.forEach(p => {
         const opt = document.createElement("option");
         opt.value = p.id;
         opt.textContent = p.nom || ("Phase " + p.id);
-        document.getElementById("phase").appendChild(opt);
+        phaseSel.appendChild(opt);
     });
 
-    document.getElementById("phase").value = state.phase;
+    phaseSel.value = state.phase;
 
+    // GLOBAL
     globalInput.value = state.progression;
     globalRange.value = state.progression;
     globalPreview.textContent = state.progression + "%";
 
+    // PHASE ACTIVE
     const active = state.phases.find(p => p.id == state.phase);
 
     phaseInput.value = active?.progress || 0;
@@ -175,12 +195,7 @@ async function createTrame() {
         ]
     };
 
-    await fetch(API, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(all)
-    });
-
+    await saveAll(all);
     loadState();
 }
 
@@ -197,11 +212,7 @@ async function deleteTrame() {
 
     delete all[current];
 
-    await fetch(API, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(all)
-    });
+    await saveAll(all);
 
     const keys = Object.keys(all);
     if (keys.length) {
@@ -228,12 +239,7 @@ async function addPhase() {
         progress: 0
     });
 
-    await fetch(API, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(all)
-    });
-
+    await saveAll(all);
     loadState();
 }
 
@@ -248,9 +254,12 @@ function renderPhaseList(state) {
         const div = document.createElement("div");
 
         div.innerHTML = `
-            <input value="${p.nom}" onchange="updatePhaseName(${p.id}, this.value)">
-            <input type="checkbox" ${p.visible ? "checked":""}
+            <input value="${p.nom}" 
+                oninput="updatePhaseName(${p.id}, this.value)">
+
+            <input type="checkbox" ${p.visible ? "checked" : ""}
                 onchange="togglePhase(${p.id}, this.checked)">
+
             <button onclick="deletePhase(${p.id})">🗑</button>
         `;
 
@@ -258,34 +267,41 @@ function renderPhaseList(state) {
     });
 }
 
-/* ================= PHASE EDIT ================= */
-function updatePhaseName(id, value) {
-    getAll().then(all => {
-        const current = trameSelect.value;
-        const state = all[current];
+/* ================= UPDATE PHASE NAME ================= */
+async function updatePhaseName(id, value) {
 
-        const p = state.phases.find(x => x.id === id);
-        if (p) p.nom = value;
+    const all = await getAll();
+    const current = document.getElementById("trameSelect").value;
 
-        saveAll(all);
-    });
+    const state = all[current];
+
+    const p = state.phases.find(x => x.id === id);
+    if (p) p.nom = value;
+
+    await saveAll(all);
 }
 
-function togglePhase(id, val) {
-    getAll().then(all => {
-        const state = all[trameSelect.value];
+/* ================= TOGGLE PHASE ================= */
+async function togglePhase(id, val) {
 
-        const p = state.phases.find(x => x.id === id);
-        if (p) p.visible = val;
+    const all = await getAll();
+    const current = document.getElementById("trameSelect").value;
 
-        saveAll(all);
-    });
+    const state = all[current];
+
+    const p = state.phases.find(x => x.id === id);
+    if (p) p.visible = val;
+
+    await saveAll(all);
 }
 
+/* ================= DELETE PHASE ================= */
 async function deletePhase(id) {
 
     const all = await getAll();
-    const state = all[trameSelect.value];
+    const current = document.getElementById("trameSelect").value;
+
+    const state = all[current];
 
     state.phases = state.phases.filter(p => p.id !== id);
 
@@ -293,31 +309,23 @@ async function deletePhase(id) {
     loadState();
 }
 
-/* ================= SAVE ================= */
+/* ================= SAVE MAIN ================= */
 async function save() {
 
     const all = await getAll();
-    const current = trameSelect.value;
+    const current = document.getElementById("trameSelect").value;
 
     const state = all[current];
 
-    state.progression = +globalInput.value;
-    state.phase = +phase.value;
+    state.progression = Number(globalInput.value);
+    state.phase = Number(document.getElementById("phase").value);
 
     const active = state.phases.find(p => p.id == state.phase);
-    if (active) active.progress = +phaseInput.value;
+    if (active) active.progress = Number(phaseInput.value);
 
     await saveAll(all);
 
     alert("Sauvegardé");
-}
-
-async function saveAll(data) {
-    await fetch(API, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify(data)
-    });
 }
 
 /* ================= SLIDERS ================= */
@@ -345,6 +353,5 @@ phaseRange.oninput = e => {
 document.addEventListener("DOMContentLoaded", loadState);
 
 </script>
-
 </body>
 </html>
