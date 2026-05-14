@@ -6,10 +6,7 @@ const API =
 // =========================
 
 function getActiveTrame() {
-
-    return localStorage.getItem(
-        "active_trame"
-    ) || "trame1";
+    return localStorage.getItem("active_trame") || "trame1";
 }
 
 // =========================
@@ -28,55 +25,41 @@ async function fetchTrames() {
 
     } catch (err) {
 
-        console.error(
-            "API ERROR",
-            err
-        );
-
+        console.error("API ERROR", err);
         return {};
     }
 }
 
 // =========================
-// INIT SELECTOR
+// SELECTOR
 // =========================
 
 function initTrameSelector(data) {
 
     const selector =
-        document.getElementById(
-            "trameSelect"
-        );
+        document.getElementById("trameSelect");
 
     if (!selector) return;
-
-    const current =
-        selector.value;
 
     selector.innerHTML = "";
 
     Object.keys(data).forEach(key => {
 
         const option =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
         option.value = key;
 
         option.textContent =
-            key.toUpperCase();
+            data[key]?.nom || key;
 
         selector.appendChild(option);
     });
 
-    const active =
-        getActiveTrame();
+    const active = getActiveTrame();
 
     selector.value =
-        data[active]
-            ? active
-            : Object.keys(data)[0];
+        data[active] ? active : Object.keys(data)[0];
 
     selector.onchange = (e) => {
 
@@ -90,38 +73,27 @@ function initTrameSelector(data) {
 }
 
 // =========================
-// RENDER PAGE
+// RENDER
 // =========================
 
 async function render() {
 
-    const all =
-        await fetchTrames();
+    const all = await fetchTrames();
 
-    const active =
-        getActiveTrame();
+    const active = getActiveTrame();
 
-    const state =
-        all?.[active];
+    const state = all?.[active];
 
     const container =
-        document.getElementById(
-            "trame-container"
-        );
+        document.getElementById("trame-container");
 
     if (!container) return;
-
-    // =========================
-    // EMPTY
-    // =========================
 
     if (!state) {
 
         container.innerHTML = `
             <section class="empty-trame">
-                <h2>
-                    Aucune trame trouvée
-                </h2>
+                <h2>Aucune trame trouvée</h2>
             </section>
         `;
 
@@ -130,14 +102,10 @@ async function render() {
         return;
     }
 
-    // =========================
-    // HTML
-    // =========================
-
     let html = "";
 
     // =========================
-    // GLOBAL PROGRESSION
+    // GLOBAL
     // =========================
 
     html += `
@@ -145,24 +113,19 @@ async function render() {
 
             <div class="campaign-header">
 
-                <h2>
-                    📡 État de la campagne
-                </h2>
+                <h2>${state.nom || active}</h2>
 
                 <span class="campaign-percent">
-                    ${state.progression}%
+                    ${state.progression ?? 0}%
                 </span>
 
             </div>
 
             <div class="campaign-bar">
 
-                <div
-                    class="campaign-fill"
-                    style="
-                        width:${state.progression}%
-                    "
-                ></div>
+                <div class="campaign-fill"
+                    style="width:${state.progression ?? 0}%">
+                </div>
 
             </div>
 
@@ -170,103 +133,74 @@ async function render() {
     `;
 
     // =========================
-    // PHASES
+    // PHASES DYNAMIQUES
     // =========================
 
-    for (let i = 1; i <= 5; i++) {
+    const phases = state.phases || [];
 
-        const visible =
-            state.visiblePhases?.[i];
+    phases.forEach((phase, index) => {
 
-        if (!visible) continue;
+        if (phase.visible === false) return;
 
-        const activePhase =
-            state.phase === i;
+        const isActive =
+            state.activePhase === phase.id;
 
         const progress =
-            activePhase
-                ? state.phaseProgress
-                : 0;
+            phase.progress ?? 0;
+
+        const name =
+            phase.nom?.trim()
+                ? phase.nom
+                : `Phase ${phase.id ?? index + 1}`;
 
         html += `
-            <section class="
-                trame-phase
-                ${activePhase
-                    ? "active-phase"
-                    : ""}
-            ">
+            <section class="trame-phase ${isActive ? "active-phase" : ""}">
 
                 <div class="phase-top">
 
-                    <h2>
-                        Phase ${i}
-                    </h2>
+                    <h2>${name}</h2>
 
-                    <span class="
-                        phase-status
-                    ">
-                        ${activePhase
-                            ? "EN COURS"
-                            : "EN ATTENTE"}
+                    <span class="phase-status">
+                        ${isActive ? "EN COURS" : "EN ATTENTE"}
                     </span>
 
                 </div>
 
                 <div class="progress-bar">
 
-                    <div
-                        class="progress-fill"
-                        style="
-                            width:${progress}%
-                        "
-                    ></div>
+                    <div class="progress-fill"
+                        style="width:${progress}%">
+                    </div>
 
                 </div>
 
                 <div class="phase-bottom">
 
-                    <span>
-                        Progression
-                    </span>
+                    <span>Progression</span>
 
-                    <strong>
-                        ${progress}%
-                    </strong>
+                    <strong>${progress}%</strong>
 
                 </div>
 
             </section>
         `;
-    }
+    });
 
-    // =========================
-    // APPLY HTML
-    // =========================
-
-    container.innerHTML =
-        html;
-
-    // =========================
-    // REFRESH SELECTOR
-    // =========================
+    container.innerHTML = html;
 
     initTrameSelector(all);
 }
+
+
 
 // =========================
 // START
 // =========================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    render
-);
+document.addEventListener("DOMContentLoaded", render);
 
 // =========================
 // AUTO REFRESH
 // =========================
 
-setInterval(
-    render,
-    5000
-);
+setInterval(render, 5000);
