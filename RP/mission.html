@@ -7,38 +7,66 @@
 <title>Terminal Mission | CVO</title>
 
 <link rel="stylesheet" href="/css/style.css">
+
 <style>
-body {
+
+body{
     background:#000;
     color:#d4af37;
-    font-family: Inter;
+    font-family:Inter;
     padding:20px;
 }
 
-.mission-card {
-    border:1px solid #333;
-    padding:15px;
-    margin-bottom:15px;
-    border-radius:8px;
+h1{
+    margin-bottom:20px;
+}
+
+.mission-card{
     background:#0a0a0a;
+    border:1px solid #333;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:20px;
 }
 
-.hidden {
-    opacity:0.4;
-    border:1px dashed #444;
+.meta{
+    opacity:.6;
+    font-size:13px;
+    margin-bottom:10px;
 }
 
-.locked {
-    filter: blur(4px);
-    user-select:none;
+img{
+    max-width:300px;
+    border-radius:8px;
+    margin-top:10px;
 }
 
-h1 { margin-bottom:20px; }
-
-.meta {
-    font-size:12px;
-    opacity:0.6;
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    background:#111;
+    border:1px solid #333;
+    color:#fff;
 }
+
+button{
+    padding:10px 15px;
+    background:#d4af37;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.locked{
+    opacity:.7;
+    border:1px dashed #555;
+}
+
+.empty{
+    opacity:.5;
+}
+
 </style>
 </head>
 
@@ -48,8 +76,13 @@ h1 { margin-bottom:20px; }
 
 <div id="mission-container"></div>
 
+<br>
 
-<a href="/RP/trames.html" class="btn primary">Retourner aux trames</a>
-<script src="/assets/js/missions.js"></script>
+<a href="/RP/trames.html" class="btn primary">
+    Retourner aux trames
+</a>
+
+<script src="/assets/js/mission.js"></script>
+
 </body>
 </html>
