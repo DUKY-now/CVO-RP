@@ -2,18 +2,14 @@
 // STORAGE
 // =========================
 
-function getAllTrames() {
+async function getAllTrames() {
     try {
-        return JSON.parse(localStorage.getItem("cvo_trames")) || {};
+        const res = await fetch("https://cvo-trames-api.dukynow.workers.dev/api/trames");
+        return await res.json();
     } catch {
         return {};
     }
 }
-
-function getActiveTrame() {
-    return localStorage.getItem("active_trame") || "trame1";
-}
-
 // =========================
 // STATE
 // =========================
@@ -79,44 +75,49 @@ function initTrameSelector() {
 // RENDER
 // =========================
 
-function renderTrames() {
-    const state = getState();
-    const container = document.getElementById("trame-container");
+async function renderTrames() {
+    const all = await getAllTrames();
+    const active = getActiveTrame();
 
+    const state = all[active] || {
+        phase: 1,
+        progression: 0,
+        phaseProgress: 0,
+        visiblePhases: { 1:true,2:true,3:true,4:true,5:true }
+    };
+
+    const container = document.getElementById("trame-container");
     if (!container) return;
 
-    // GLOBAL BAR
-    const globalBar = document.getElementById("globalBar");
-    const globalText = document.getElementById("globalPercent");
-
-    if (globalBar) globalBar.style.width = state.progression + "%";
-    if (globalText) globalText.textContent = state.progression + "%";
-
-    // PHASES
     let html = "";
+
+    html += `
+        <section class="section">
+            <h2>📊 Progression globale</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width:${state.progression}%"></div>
+            </div>
+            <p>${state.progression}%</p>
+        </section>
+    `;
 
     for (let i = 1; i <= 5; i++) {
 
-        const visible = state.visiblePhases?.[i] ?? true;
-        if (!visible) continue;
+        if (!state.visiblePhases?.[i]) continue;
 
-        const active = state.phase === i;
-        const progress = active ? state.phaseProgress : 0;
+        const activePhase = state.phase === i;
+        const progress = activePhase ? state.phaseProgress : 0;
 
         html += `
-        <div class="phase-card ${active ? "active" : ""}">
-            
-            <div class="phase-title">
-                <h3>Phase ${i}</h3>
-                <span>${progress}%</span>
-            </div>
+            <section class="section phase-block ${activePhase ? "active-phase" : ""}">
+                <h2>Phase ${i}</h2>
 
-            <div class="progress-bar">
-                <div class="progress-fill" style="width:${progress}%"></div>
-            </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:${progress}%"></div>
+                </div>
 
-            <p>Contenu de la phase ${i}</p>
-        </div>
+                <p>${progress}%</p>
+            </section>
         `;
     }
 
@@ -127,10 +128,8 @@ function renderTrames() {
 // INIT
 // =========================
 
-document.addEventListener("DOMContentLoaded", () => {
-    initTrameSelector();
-    renderTrames();
-});
+document.addEventListener("DOMContentLoaded", renderTrames);
+setInterval(renderTrames, 5000);
 
 // =========================
 // LIVE SYNC (admin + multi-tab)
