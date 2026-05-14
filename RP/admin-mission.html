@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Admin Missions</title>
+
+<link rel="stylesheet" href="/css/style.css">
+<style>
+body {
+    background:#000;
+    color:#d4af37;
+    font-family:Inter;
+    padding:20px;
+}
+
+.card {
+    border:1px solid #333;
+    padding:15px;
+    margin-bottom:15px;
+}
+textarea {
+    width:100%;
+    height:80px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🛠 ADMIN MISSIONS</h1>
+
+<input id="missionName" placeholder="Nom mission">
+<button onclick="createMission()">Créer</button>
+
+<hr>
+
+<select id="missionSelect"></select>
+
+<h3>➕ Note</h3>
+
+<input id="title" placeholder="Titre">
+<textarea id="content" placeholder="Contenu"></textarea>
+
+<input id="codeUnlock" placeholder="Code (optionnel)">
+<input id="unlockTime" type="datetime-local">
+
+<h3>Médias</h3>
+
+<input id="mediaUrl" placeholder="URL image ou fichier">
+<select id="mediaType">
+    <option value="image">Image</option>
+    <option value="file">Fichier</option>
+</select>
+
+<button onclick="addNote()">Ajouter note</button>
+
+<hr>
+
+<h3>Preuves</h3>
+
+<input id="proofTitle" placeholder="Titre preuve">
+<input id="proofDesc" placeholder="Description">
+<input id="proofImg" placeholder="Image URL">
+
+<button onclick="addProof()">Ajouter preuve</button>
+
+<script src="/assets/js/admin-missions.js"></script>
+</body>
+</html>

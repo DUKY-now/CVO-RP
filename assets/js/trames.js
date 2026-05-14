@@ -7,14 +7,13 @@ function getActive() {
 async function fetchData() {
     try {
         const res = await fetch(API + "?t=" + Date.now());
-        return await res.json();
+        const data = await res.json();
+        return data && typeof data === "object" ? data : {};
     } catch (e) {
         console.error(e);
         return {};
     }
 }
-
-/* ================= SELECTOR ================= */
 
 function initSelector(all) {
     const sel = document.getElementById("trameSelect");
@@ -22,18 +21,20 @@ function initSelector(all) {
 
     sel.innerHTML = "";
 
-    Object.keys(all).forEach(key => {
+    const keys = Object.keys(all);
+
+    keys.forEach(key => {
         const opt = document.createElement("option");
         opt.value = key;
         opt.textContent = all[key].nom || key;
         sel.appendChild(opt);
     });
 
-    const active = getActive();
+    let active = getActive();
+    if (!all[active]) active = keys[0];
 
-    sel.value = all[active] ? active : Object.keys(all)[0];
-
-    localStorage.setItem("active_trame", sel.value);
+    sel.value = active;
+    localStorage.setItem("active_trame", active);
 
     sel.onchange = () => {
         localStorage.setItem("active_trame", sel.value);
@@ -41,22 +42,25 @@ function initSelector(all) {
     };
 }
 
-/* ================= RENDER ================= */
-
 async function render() {
-
     const all = await fetchData();
+    const keys = Object.keys(all);
+
+    const container = document.getElementById("trame-container");
+    if (!container) return;
+
+    if (!keys.length) {
+        container.innerHTML = "<p>Aucune trame</p>";
+        return;
+    }
 
     initSelector(all);
 
     const active = getActive();
     const trame = all[active];
 
-    const container = document.getElementById("trame-container");
-    if (!container) return;
-
     if (!trame) {
-        container.innerHTML = "<p>Aucune trame trouvée</p>";
+        container.innerHTML = "<p>Trame introuvable</p>";
         return;
     }
 
@@ -77,9 +81,7 @@ async function render() {
 
     // PHASES
     if (Array.isArray(trame.phases)) {
-
         trame.phases.forEach(p => {
-
             if (!p.visible) return;
 
             html += `
