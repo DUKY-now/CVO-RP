@@ -1,26 +1,13 @@
 const API = "https://cvo-trames-api.dukynow.workers.dev/api/trames";
 
-/* ================= LOGIN ================= */
-function login() {
-    const input = document.getElementById("pwd").value;
-
-    if (input !== "admin") {
-        document.getElementById("error").innerText = "Accès refusé";
-        return;
-    }
-
-    document.getElementById("login-box").style.display = "none";
-    document.getElementById("panel").style.display = "block";
-    loadState();
-}
-
 /* ================= FETCH ================= */
 async function getAll() {
     try {
         const res = await fetch(API + "?t=" + Date.now());
         const data = await res.json();
         return data && typeof data === "object" ? data : {};
-    } catch {
+    } catch (e) {
+        console.error(e);
         return {};
     }
 }
@@ -34,13 +21,28 @@ async function saveAll(data) {
     });
 }
 
-/* ================= ACTIVE ================= */
+/* ================= LOGIN ================= */
+function login() {
+    const input = document.getElementById("pwd").value;
+
+    if (input !== "admin") {
+        document.getElementById("error").innerText = "Accès refusé";
+        return;
+    }
+
+    document.getElementById("login-box").style.display = "none";
+    document.getElementById("panel").style.display = "block";
+
+    loadState();
+}
+
+/* ================= CURRENT TRAME ================= */
 function getCurrent(all) {
     let current = localStorage.getItem("active_trame");
 
     if (!current || !all[current]) {
         const keys = Object.keys(all);
-        current = keys[0] || null;
+        current = keys[0];
         if (current) localStorage.setItem("active_trame", current);
     }
 
@@ -71,36 +73,35 @@ function initSelector(all, current) {
 async function loadState() {
 
     const all = await getAll();
-    const keys = Object.keys(all);
-
-    if (!keys.length) return;
-
     const current = getCurrent(all);
-    if (!current) return;
+    const state = all[current];
+
+    if (!state) return;
 
     initSelector(all, current);
 
-    const state = all[current];
-    if (!state) return;
-
-    // PHASE SELECT
+    /* PHASE SELECT */
     const phaseSel = document.getElementById("phase");
     phaseSel.innerHTML = "";
 
-    (state.phases || []).forEach(p => {
+    state.phases = state.phases || [];
+
+    state.phases.forEach(p => {
         const opt = document.createElement("option");
         opt.value = p.id;
-        opt.textContent = p.nom || ("Phase " + p.id);
+        opt.textContent = p.nom;
         phaseSel.appendChild(opt);
     });
 
     phaseSel.value = state.phase || 1;
 
+    /* GLOBAL */
     globalInput.value = state.progression || 0;
     globalRange.value = state.progression || 0;
     globalPreview.textContent = (state.progression || 0) + "%";
 
-    const active = (state.phases || []).find(p => p.id == state.phase);
+    /* PHASE */
+    const active = state.phases.find(p => p.id == state.phase);
 
     phaseInput.value = active?.progress || 0;
     phaseRange.value = active?.progress || 0;
@@ -116,7 +117,6 @@ async function createTrame() {
     if (!name) return;
 
     const all = await getAll();
-
     const key = name.toLowerCase().replace(/\s+/g, "_");
 
     if (all[key]) return alert("Existe déjà");
@@ -125,7 +125,10 @@ async function createTrame() {
         nom: name,
         progression: 0,
         phase: 1,
-        phases: [{ id: 1, nom: "Phase 1", visible: true, progress: 0 }]
+        phases: [
+            { id: 1, nom: "Phase 1", visible: true, progress: 0 }
+        ],
+        missions: []
     };
 
     await saveAll(all);
@@ -135,12 +138,12 @@ async function createTrame() {
 /* ================= DELETE TRAME ================= */
 async function deleteTrame() {
 
-    const current = document.getElementById("trameSelect").value;
     const all = await getAll();
+    const current = document.getElementById("trameSelect").value;
 
     if (!all[current]) return;
 
-    if (!confirm("Supprimer cette trame ?")) return;
+    if (!confirm("Supprimer " + current + " ?")) return;
 
     delete all[current];
 
@@ -176,69 +179,6 @@ async function addPhase() {
     loadState();
 }
 
-/* ================= PHASE LIST ================= */
-function renderPhaseList(state) {
-
-    const container = document.getElementById("phaseList");
-    container.innerHTML = "";
-
-    (state.phases || []).forEach(p => {
-
-        const div = document.createElement("div");
-
-        div.innerHTML = `
-            <input value="${p.nom}"
-                oninput="updatePhaseName(${p.id}, this.value)">
-
-            <input type="checkbox"
-                ${p.visible ? "checked" : ""}
-                onchange="togglePhase(${p.id}, this.checked)">
-
-            <button onclick="deletePhase(${p.id})">🗑</button>
-        `;
-
-        container.appendChild(div);
-    });
-}
-
-/* ================= EDIT PHASE ================= */
-async function updatePhaseName(id, value) {
-    const all = await getAll();
-    const current = document.getElementById("trameSelect").value;
-
-    const state = all[current];
-    const p = state?.phases?.find(x => x.id === id);
-
-    if (p) p.nom = value;
-
-    await saveAll(all);
-}
-
-async function togglePhase(id, val) {
-    const all = await getAll();
-    const current = document.getElementById("trameSelect").value;
-
-    const state = all[current];
-    const p = state?.phases?.find(x => x.id === id);
-
-    if (p) p.visible = val;
-
-    await saveAll(all);
-}
-
-async function deletePhase(id) {
-    const all = await getAll();
-    const current = document.getElementById("trameSelect").value;
-
-    const state = all[current];
-    if (!state) return;
-
-    state.phases = state.phases.filter(p => p.id !== id);
-
-    await saveAll(all);
-    loadState();
-}
-
 /* ================= SAVE ================= */
 async function save() {
 
@@ -256,28 +196,67 @@ async function save() {
 
     await saveAll(all);
 
-    alert("Sauvegardé");
+    alert("Sauvegardé ✔");
 }
 
-/* ================= SLIDERS ================= */
-globalInput.oninput = e => {
-    globalRange.value = e.target.value;
-    globalPreview.textContent = e.target.value + "%";
-};
+/* ================= PHASE LIST ================= */
+function renderPhaseList(state) {
 
-globalRange.oninput = e => {
-    globalInput.value = e.target.value;
-    globalPreview.textContent = e.target.value + "%";
-};
+    const c = document.getElementById("phaseList");
+    c.innerHTML = "";
 
-phaseInput.oninput = e => {
-    phaseRange.value = e.target.value;
-    phasePreview.textContent = e.target.value + "%";
-};
+    state.phases.forEach(p => {
 
-phaseRange.oninput = e => {
-    phaseInput.value = e.target.value;
-    phasePreview.textContent = e.target.value + "%";
-};
+        const div = document.createElement("div");
 
+        div.innerHTML = `
+            <input value="${p.nom}"
+                oninput="updatePhaseName(${p.id}, this.value)">
+
+            <input type="checkbox"
+                ${p.visible ? "checked" : ""}
+                onchange="togglePhase(${p.id}, this.checked)">
+
+            <button onclick="deletePhase(${p.id})">🗑</button>
+        `;
+
+        c.appendChild(div);
+    });
+}
+
+/* ================= PHASE EDIT ================= */
+async function updatePhaseName(id, value) {
+    const all = await getAll();
+    const current = trameSelect.value;
+    const state = all[current];
+
+    const p = state.phases.find(x => x.id === id);
+    if (p) p.nom = value;
+
+    await saveAll(all);
+}
+
+async function togglePhase(id, val) {
+    const all = await getAll();
+    const current = trameSelect.value;
+    const state = all[current];
+
+    const p = state.phases.find(x => x.id === id);
+    if (p) p.visible = val;
+
+    await saveAll(all);
+}
+
+async function deletePhase(id) {
+    const all = await getAll();
+    const current = trameSelect.value;
+    const state = all[current];
+
+    state.phases = state.phases.filter(p => p.id !== id);
+
+    await saveAll(all);
+    loadState();
+}
+
+/* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", loadState);

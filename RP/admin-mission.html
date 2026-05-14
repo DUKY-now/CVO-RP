@@ -2,70 +2,112 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Admin Missions</title>
+<title>Admin Missions RP</title>
 
 <link rel="stylesheet" href="/css/style.css">
-<style>
-body {
-    background:#000;
-    color:#d4af37;
-    font-family:Inter;
-    padding:20px;
-}
+<link rel="stylesheet" href="/css/pages/adminmission.css">
 
-.card {
-    border:1px solid #333;
-    padding:15px;
-    margin-bottom:15px;
-}
-textarea {
-    width:100%;
-    height:80px;
-}
-</style>
 </head>
 
 <body>
 
-<h1>🛠 ADMIN MISSIONS</h1>
+<h1>🛠 ADMIN MISSIONS RP</h1>
 
-<input id="missionName" placeholder="Nom mission">
-<button onclick="createMission()">Créer</button>
+<!-- ================= CONTEXTE RP ================= -->
+<div class="card">
+
+    <h2>📍 Contexte RP (Trame / Phase)</h2>
+
+    <!-- TRAME ACTIVE -->
+    <label>Trame</label>
+    <select id="trameSelect"></select>
+
+    <!-- PHASE ACTIVE -->
+    <label>Phase</label>
+    <select id="phaseSelect"></select>
+
+</div>
+
+<!-- ================= CREATION MISSION ================= -->
+<div class="card">
+
+    <h2>➕ Créer une mission</h2>
+
+    <input id="missionName" placeholder="Nom mission">
+    <button onclick="createMission()">Créer mission</button>
+
+</div>
 
 <hr>
 
-<select id="missionSelect"></select>
+<!-- ================= SELECTION MISSION ================= -->
+<div class="card">
 
-<h3>➕ Note</h3>
+    <h2>✏️ Mission active</h2>
 
-<input id="title" placeholder="Titre">
-<textarea id="content" placeholder="Contenu"></textarea>
+    <select id="missionSelect"></select>
 
-<input id="codeUnlock" placeholder="Code (optionnel)">
-<input id="unlockTime" type="datetime-local">
+</div>
 
-<h3>Médias</h3>
+<!-- ================= EDIT MISSION ================= -->
+<div class="card">
 
-<input id="mediaUrl" placeholder="URL image ou fichier">
-<select id="mediaType">
-    <option value="image">Image</option>
-    <option value="file">Fichier</option>
-</select>
+    <h3>📝 Contenu mission</h3>
 
-<button onclick="addNote()">Ajouter note</button>
+    <input id="title" placeholder="Titre">
+    <textarea id="content" placeholder="Contenu mission"></textarea>
+
+    <input id="codeUnlock" placeholder="Code RP (optionnel)">
+    <input id="unlockTime" type="datetime-local">
+
+</div>
+
+<!-- ================= MEDIAS ================= -->
+<div class="card">
+
+    <h3>🖼 Médias (images / fichiers RP)</h3>
+
+    <input id="mediaUrl" placeholder="URL image ou fichier">
+
+    <select id="mediaType">
+        <option value="image">Image</option>
+        <option value="file">Fichier</option>
+    </select>
+
+    <button onclick="addMedia()">Ajouter média</button>
+
+</div>
+
+<!-- ================= PREUVES ================= -->
+<div class="card">
+
+    <h3>📂 Preuves RP</h3>
+
+    <input id="proofTitle" placeholder="Titre preuve">
+    <input id="proofDesc" placeholder="Description">
+    <input id="proofImg" placeholder="Image URL">
+
+    <button onclick="addProof()">Ajouter preuve</button>
+
+</div>
 
 <hr>
 
-<h3>Preuves</h3>
+<!-- ================= NOTES / VISUALISATION ================= -->
+<div class="card">
 
-<input id="proofTitle" placeholder="Titre preuve">
-<input id="proofDesc" placeholder="Description">
-<input id="proofImg" placeholder="Image URL">
+    <h2>📜 Notes de mission (preview admin)</h2>
 
-<button onclick="addProof()">Ajouter preuve</button>
+    <!-- IMPORTANT : affichage dynamique -->
+    <div id="notesList"></div>
 
+</div>
 
-<a href="/RP/admin.html" class="btn primary">Retourner sur la page admin</a>
+<hr>
+
+<a href="/RP/admin.html">⬅ Retour admin principal</a>
+
 <script src="/assets/js/admin-missions.js"></script>
+
 </body>
 </html>

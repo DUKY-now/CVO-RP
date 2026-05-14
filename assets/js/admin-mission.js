@@ -1,119 +1,203 @@
-const API = "https://cvo-trames-api.dukynow.workers.dev/api/missions";
+const API_TRAMES = "https://cvo-trames-api.dukynow.workers.dev/api/trames";
+const API_MISSIONS = "https://cvo-trames-api.dukynow.workers.dev/api/missions";
 
-async function getAll() {
-    return await (await fetch(API)).json();
+/* ================= UTIL ================= */
+
+async function getTrames() {
+    return await (await fetch(API_TRAMES + "?t=" + Date.now())).json();
 }
 
-function getActive() {
-    return localStorage.getItem("active_mission") || "mission1";
+async function getMissions() {
+    return await (await fetch(API_MISSIONS + "?t=" + Date.now())).json();
+}
+
+async function saveMissions(data) {
+    await fetch(API_MISSIONS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+}
+
+/* ================= ACTIVE CONTEXT ================= */
+
+function getActiveTrame() {
+    return localStorage.getItem("active_trame");
+}
+
+function getActivePhase() {
+    return localStorage.getItem("active_phase") || "1";
 }
 
 /* ================= INIT ================= */
+
+document.addEventListener("DOMContentLoaded", load);
+
 async function load() {
 
-    const all = await getAll();
+    const trames = await getTrames();
 
-    const sel = document.getElementById("missionSelect");
-    sel.innerHTML = "";
+    initTrameSelect(trames);
 
-    Object.keys(all).forEach(k => {
-        const opt = document.createElement("option");
-        opt.value = k;
-        opt.textContent = all[k].nom;
-        sel.appendChild(opt);
-    });
+    const trameSel = document.getElementById("trameSelect");
+    const phaseSel = document.getElementById("phaseSelect");
 
-    sel.value = getActive();
-
-    sel.onchange = () => {
-        localStorage.setItem("active_mission", sel.value);
+    trameSel.onchange = () => {
+        localStorage.setItem("active_trame", trameSel.value);
         load();
     };
 
-    renderNotes(all[sel.value]);
-}
-
-/* ================= CREATE MISSION ================= */
-async function createMission() {
-
-    const name = document.getElementById("missionName").value.trim();
-    if (!name) return;
-
-    const all = await getAll();
-    const key = name.toLowerCase().replace(/\s+/g, "_");
-
-    all[key] = {
-        nom: name,
-        classification: "CONFIDENTIEL",
-        notes: []
+    phaseSel.onchange = () => {
+        localStorage.setItem("active_phase", phaseSel.value);
+        render();
     };
 
-    await save(all);
-    load();
+    initPhaseSelect(trames);
+
+    render();
 }
 
-/* ================= ADD NOTE ================= */
-async function addNote() {
+/* ================= TRAME SELECT ================= */
 
-    const all = await getAll();
-    const current = document.getElementById("missionSelect").value;
+function initTrameSelect(trames) {
 
-    all[current].notes.push({
-        titre: document.getElementById("noteTitle").value,
-        contenu: document.getElementById("noteContent").value,
-        visible: false
+    const sel = document.getElementById("trameSelect");
+    sel.innerHTML = "";
+
+    Object.keys(trames).forEach(k => {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = trames[k].nom || k;
+        sel.appendChild(opt);
     });
 
-    await save(all);
-    load();
+    const active = getActiveTrame() || Object.keys(trames)[0];
+
+    sel.value = active;
+    localStorage.setItem("active_trame", active);
 }
 
-/* ================= TOGGLE ================= */
-async function toggle(missionKey, index) {
+/* ================= PHASE SELECT ================= */
 
-    const all = await getAll();
+function initPhaseSelect(trames) {
 
-    all[missionKey].notes[index].visible =
-        !all[missionKey].notes[index].visible;
+    const trame = trames[getActiveTrame()];
+    const sel = document.getElementById("phaseSelect");
 
-    await save(all);
-    load();
+    sel.innerHTML = "";
+
+    if (!trame?.phases) return;
+
+    trame.phases.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.nom;
+        sel.appendChild(opt);
+    });
+
+    const active = getActivePhase();
+    sel.value = active;
 }
 
 /* ================= RENDER ================= */
-function renderNotes(mission) {
 
-    const c = document.getElementById("notesList");
-    const key = document.getElementById("missionSelect").value;
+async function render() {
 
-    c.innerHTML = "";
+    const trames = await getTrames();
+    const missions = await getMissions();
 
-    mission.notes.forEach((n, i) => {
+    const trameKey = getActiveTrame();
+    const phaseId = getActivePhase();
+
+    const list = document.getElementById("notesList");
+    list.innerHTML = "";
+
+    if (!missions) return;
+
+    Object.keys(missions).forEach(key => {
+
+        const m = missions[key];
+
+        // filtre par trame + phase
+        if (m.trame !== trameKey) return;
+        if (m.phase != phaseId) return;
 
         const div = document.createElement("div");
         div.className = "card";
 
         div.innerHTML = `
-            <h3>${n.titre}</h3>
-            <p>${n.contenu}</p>
-            <button onclick="toggle('${key}', ${i})">
-                ${n.visible ? "Masquer" : "Révéler"}
-            </button>
+            <h3>${m.titre}</h3>
+            <p>${m.content}</p>
+
+            ${m.code ? `<small>🔐 Code requis</small>` : ""}
+
+            ${m.unlockAt ? `<small>⏰ ${m.unlockAt}</small>` : ""}
         `;
 
-        c.appendChild(div);
+        list.appendChild(div);
     });
 }
 
-/* ================= SAVE ================= */
-async function save(all) {
+/* ================= CREATE MISSION ================= */
 
-    await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(all)
-    });
+async function createMission() {
+
+    const trame = getActiveTrame();
+    const phase = getActivePhase();
+
+    const missions = await getMissions();
+
+    const id = "mission_" + Date.now();
+
+    missions[id] = {
+        id,
+        trame,
+        phase,
+        titre: document.getElementById("missionName").value,
+        content: "",
+        code: "",
+        unlockAt: null,
+        media: [],
+        proofs: []
+    };
+
+    await saveMissions(missions);
+    render();
 }
 
-/* ================= START ================= */
-document.addEventListener("DOMContentLoaded", load);
+/* ================= ADD MEDIA ================= */
+
+async function addMedia() {
+
+    const missions = await getMissions();
+    const id = document.getElementById("missionSelect").value;
+
+    if (!missions[id]) return;
+
+    missions[id].media.push({
+        type: document.getElementById("mediaType").value,
+        url: document.getElementById("mediaUrl").value
+    });
+
+    await saveMissions(missions);
+    render();
+}
+
+/* ================= ADD PROOF ================= */
+
+async function addProof() {
+
+    const missions = await getMissions();
+    const id = document.getElementById("missionSelect").value;
+
+    if (!missions[id]) return;
+
+    missions[id].proofs.push({
+        title: document.getElementById("proofTitle").value,
+        desc: document.getElementById("proofDesc").value,
+        img: document.getElementById("proofImg").value
+    });
+
+    await saveMissions(missions);
+    render();
+}
